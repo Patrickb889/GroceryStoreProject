@@ -12,6 +12,11 @@ void setup() {
   size(800, 600);
   frameRate(20);
   
+  fill(0);
+  textSize(30);
+  textAlign(CENTER);
+  text("Loading...", 400, 300);
+  
   for (int i = 0; i < 5; i++) {
     shoppers.add(new Shopper(entrance.x, entrance.y, round(random(1, 5)), importedList));
   }
@@ -23,12 +28,14 @@ ArrayList<ArrayList<PVector>> paths = new ArrayList<ArrayList<PVector>>();
 //PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
 PVector[] list = new PVector[]{entrance, new PVector(25, 200), new PVector(75, 250), new PVector(35, 460), new PVector(260, 200), new PVector(340, 300), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450), new PVector(675, 300), exit};
 //todo: fix undefined slope or 0 slope cases for intersection checking
+//todo: instead of using PVector array for obstacles, create each as a fixture object and store in ArrayList<Fixture>
 
 void draw() {
   background(173, 176, 186);
   //user.updateMe(800, 600);
   //user.drawMe();
   
+
   
   fill(255, 0, 0);
   stroke(0);
@@ -36,7 +43,6 @@ void draw() {
   for (int[] ob : obstacles)
     rect(ob[0], ob[1], ob[2] - ob[0], ob[3] - ob[1]);
     
-  
     
   stroke(0, 255, 0);
   strokeWeight(3);
@@ -45,7 +51,6 @@ void draw() {
       line(ap.get(i-1).x, ap.get(i-1).y, ap.get(i).x, ap.get(i).y);
     }
   }
-  
   
   fill(0, 0, 255);
   stroke(0);
