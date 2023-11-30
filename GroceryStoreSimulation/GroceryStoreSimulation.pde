@@ -20,7 +20,7 @@ boolean pathCalculated = false;
 
 ArrayList<ArrayList<PVector>> paths = new ArrayList<ArrayList<PVector>>();
 //PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
-PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 225), new PVector(360, 224), new PVector(390, 390), new PVector(550, 450)};
+PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 300), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
 //todo: fix undefined slope or 0 slope cases for intersection checking
 
 void draw() {
