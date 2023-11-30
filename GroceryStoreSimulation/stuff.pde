@@ -21,8 +21,7 @@ boolean obsPresent(PVector destination, PVector currPoint) {  // checks whether 
     //println(destination);
     //println(obstacles[i]);
     //println(currPoint);
-    //if (destination.x == 450 && destination.y == 450 && currPoint.x == 390 && currPoint.y == 400)
-    //println("FUCK"); //<>//
+    //if (destination.x == 450 && destination.y == 450 && currPoint.x == 390 && currPoint.y == 400) //<>//
     //println(intersectionFound(obstacles[i], currPoint, destination));
     //println(pathToCorner(currPoint, destination));
     if (intersectionFound(obstacles[i], currPoint, destination)) {
@@ -92,7 +91,6 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
               line(p1.x, p1.y, p2.x, p2.y);
             }
             else {
-              //println("ASS");
               PVector p1 = cornerCoords(obstacles[(pointIndex-1)/4])[(pointIndex-1) % 4];
               PVector p2 = cornerCoords(obstacles[(cornerIndex-1)/4])[(cornerIndex-1) % 4];
               line(p1.x, p1.y, p2.x, p2.y);
