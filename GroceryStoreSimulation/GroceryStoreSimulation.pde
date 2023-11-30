@@ -44,7 +44,7 @@ void draw() {
     rect(ob[0], ob[1], ob[2] - ob[0], ob[3] - ob[1]);
     
     
-  stroke(0, 255, 0);
+  stroke(0, 150, 255);
   strokeWeight(3);
   for (ArrayList<PVector> ap : paths) {
     for (int i = 1; i < ap.size(); i++) {
@@ -58,6 +58,7 @@ void draw() {
   for (PVector item : list)
     circle(item.x, item.y, 8);
 
+  // todo (fix):
   //pathFind(new PVector(700, 500), new PVector(round(random(0, 100)), round(random(0, 599))));
   //shortestDistancesCopy = new float[obstacles.length * 4 + 1][2];
   //for (int i = 0; i < shortestDistances.length; i++) {

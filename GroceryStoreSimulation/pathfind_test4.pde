@@ -14,6 +14,7 @@
 // after all searching and drawing is done, use all info stored in this array to update copy array with new distances (start at last point before common point or second last point if no common point)
 // backtrack through path according to new array, at any given index, update copy array to have distance = total - partial distance according to new array and index = previous index
 
+// INITIALIZATION
 ArrayList<PVector> nextSteps = new ArrayList<PVector>();
 int[][] obstacles = new int[][]{new int[]{675, 100, 700, 500}, new int[]{75, 250, 200, 375}, new int[]{75, 395, 200, 520}, new int[]{0, 100, 25, 300}, new int[]{0, 320, 35, 600}, new int[]{200, 565, 790, 600}, new int[]{150, 170, 280, 180}, new int[]{395, 365, 430, 475}, new int[]{300, 100, 310, 350}, new int[]{320, 100, 330, 350}, new int[]{340, 100, 350, 350}, new int[]{360, 100, 370, 350}, new int[]{380, 100, 390, 350}, new int[]{400, 100, 410, 350}, new int[]{450, 250, 550, 450}, new int[]{290, 390, 390, 500}, new int[]{250, 200, 260, 400}};//new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}};
 int[][] viableNextSteps = new int[obstacles.length * 4 + 1][];  // viable next steps for each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
@@ -37,13 +38,9 @@ int[] nextPointsCounter = new int[obstacles.length * 4 + 1];
 float minDist = -1;
 int minIndex = -1;
 
-//void setup() {
-//  size(800, 600);
-  
-//}
 
 void pathFind(PVector start, PVector end) {
-  // initialize all variables and lists
+  // reinitialize all variables and lists
   nextSteps = new ArrayList<PVector>();
   viableNextSteps = new int[obstacles.length * 4 + 1][];  // viable next steps for each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
   shortestDistances = new float[obstacles.length * 4 + 1][2];  //index 0 is dist, index 1 is point index of point it came from to get that dist
@@ -60,32 +57,37 @@ void pathFind(PVector start, PVector end) {
   minIndex = -1;
   
   
-  fill(0, 0, 255);
-  circle(start.x, start.y, 10);
-  circle(end.x, end.y, 10);
-  fill(0);
-  strokeWeight(4);
-  line(start.x, start.y, end.x, end.y);
-  strokeWeight(1);
+  //fill(0, 0, 255);
+  //circle(start.x, start.y, 10);
+  //circle(end.x, end.y, 10);
+  //fill(0);
+  //strokeWeight(4);
+  //line(start.x, start.y, end.x, end.y);
+  //strokeWeight(1);
   
-  widthRangeObsCheck = new int[width][width][0];
-  heightRangeObsCheck = new int[height][height][0];
+  // 2d array containing information about which obstacles can be found in each pixel range for both x and y
+  widthRangeObsCheck = new int[width][width][0];  // index i is the lowest number of the range, index j is the highest, array at [i][j] would contain all indices of obstacles with x values in that range
+  heightRangeObsCheck = new int[height][height][0];  // same but for y
   
+  // Iterate through all obstacles
   for (int i = 0; i < obstacles.length; i++) {
     int[] ob = obstacles[i];
+    // Ranges that should be updated include ranges with lowest value less than obstacle's rightmost x and highest value more than obstacle's leftmost x
     for (int lower = 0; lower < ob[2]; lower++) {
       for (int higher = max(lower + 1, ob[0] + 1); higher < width; higher++)
         widthRangeObsCheck[lower][higher] = append(widthRangeObsCheck[lower][higher], i);
     }
     
+    // Update ranges with lowest val less than bottommost y (largest y for the obstacle) and highest more than topmost y (smallest y)
     for (int lower = 0; lower <= ob[3]; lower++) {
       for (int higher = max(lower + 1, ob[1]); higher < height; higher++)
         heightRangeObsCheck[lower][higher] = append(heightRangeObsCheck[lower][higher], i);
     }
   }
   
-  currPoints.add(new int[]{0});
+  currPoints.add(new int[]{0});  // Add the start point as the first point
   
+  // initialization finished
   
   //todo: make it so that middle points will not be chosen (like it was before)
   // for each obstacle, only check two corners that are relevant (if three can be reached, second and third farthest, if two can be reached, two closest
@@ -95,6 +97,8 @@ void pathFind(PVector start, PVector end) {
   // proceed as normal (same, just less corners, therefore less branches)
   //if no time, just take order as provided in shopping list
   //todo: clean up stinky code
+  
+  // each step would involve each path moving forward by one line segment (max path length would go through each obstacle corner once)
   for (int step = -1; step < pathInfo.length - 1; step++) {
     for (int[] index : currPoints) {
       int i = index[0];
@@ -110,6 +114,7 @@ void pathFind(PVector start, PVector end) {
           dist = pathInfo[step][i][0];
         }
         
+      //todo (fix):
       //if (shortestDistancesCopy[i][0] != 0) {
       //  println(i);
       //  float totalDist = dist + shortestDistancesCopy[i][0];
@@ -145,6 +150,7 @@ void pathFind(PVector start, PVector end) {
       }
     }
     
+    // If there are no next points to check, pathfinding is finished (break out of outer loop)
     if (nextPoints.size() == 0)
       break;
       
