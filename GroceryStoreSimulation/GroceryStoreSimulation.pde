@@ -1,6 +1,7 @@
 //float enteranceX = 0;
 //float enteranceY = 0;
 PVector entrance = new PVector(0, 0);
+PVector exit = new PVector(100, 0);
 float userSpeed = 1;
 ArrayList<String> importedList = new ArrayList<String>();
 
@@ -20,7 +21,7 @@ boolean pathCalculated = false;
 
 ArrayList<ArrayList<PVector>> paths = new ArrayList<ArrayList<PVector>>();
 //PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
-PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 300), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
+PVector[] list = new PVector[]{entrance, new PVector(25, 200), new PVector(75, 250), new PVector(35, 460), new PVector(260, 200), new PVector(340, 300), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450), new PVector(675, 300), exit};
 //todo: fix undefined slope or 0 slope cases for intersection checking
 
 void draw() {
