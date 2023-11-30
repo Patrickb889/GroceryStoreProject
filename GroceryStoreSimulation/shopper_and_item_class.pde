@@ -73,6 +73,8 @@ class Shopper {
   
   void drawMe() {
     fill(22, 133, 201);
+    stroke(0);
+    strokeWeight(1);
     circle(this.position.x, this.position.y, 10);
   }
 }
