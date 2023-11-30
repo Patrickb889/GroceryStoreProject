@@ -12,28 +12,37 @@ class Shopper {
    this.speed = s; //Speed of the shoper for the drawing
    this.shoppingList = sL; //The items the shopper needs to get as strings in an array list
    this.destination = new PVector(round(random(0, width)), round(random(0, height)));
+   this.updateVel();
   }
   
   //Methods
-  void updateMe() {
+  void updateVel() {
     float nextX = this.destination.x;
     float nextY = this.destination.y;
     
-   //Making a unit vector in the direction the shopper should move
-   this.direction = new PVector(nextX - this.position.x, nextY - this.position.y);
-   float magnitude = mag(this.direction.x, this.direction.y);
-   this.direction.div(magnitude);
+    //Making a unit vector in the direction the shopper should move
+    this.direction = new PVector(nextX - this.position.x, nextY - this.position.y);
+    float magnitude = mag(this.direction.x, this.direction.y);
+    this.direction.div(magnitude);
    
-   //the distance the shopper should move
-   this.velocity = this.direction.mult(this.speed);
+    //the distance the shopper should move
+    this.velocity = this.direction.mult(this.speed);
+  }
+  
+  void updateMe() {
+    float prevX = this.position.x;
+    
+    //Updating the positon
+    this.position.add(this.velocity);
+    
+    //check if destination reached
+    if (prevX <= this.destination.x && this.destination.x <= this.position.x || this.position.x <= this.destination.x && this.destination.x <= prevX) {
+      this.destination = new PVector(round(random(0, width)), round(random(0, height)));
+      updateVel();
+    }
    
-   //check if destination reached
-   float newX = this.position.x + this.velocity.x;
-   if (this.position.x <= nextX && nextX <= newX || newX <= nextX && nextX <= this.position.x)
-     this.destination = new PVector(round(random(0, width)), round(random(0, height)));
-   
-   //Updating the positon
-   this.position.add(this.velocity);
+    
+    
   }
   
   void drawMe() {

@@ -10,7 +10,7 @@ ArrayList<Shopper> shoppers = new ArrayList<Shopper>();
 
 void setup() {
   size(800, 600);
-  frameRate(20);
+  frameRate(40);
   
   fill(0);
   textSize(30);
@@ -18,7 +18,7 @@ void setup() {
   text("Loading...", 400, 300);
   
   for (int i = 0; i < 5; i++) {
-    shoppers.add(new Shopper(entrance.x, entrance.y, round(random(1, 5)), importedList));
+    shoppers.add(new Shopper(entrance.x, entrance.y, random(0.5, 2), importedList));
   }
 }
 
