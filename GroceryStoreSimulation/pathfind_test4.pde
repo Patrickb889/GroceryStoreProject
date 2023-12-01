@@ -258,6 +258,7 @@ void pathFind(PVector start, PVector end) {
 //}
 
 // Finds number of corners on an obstacle a point to get to directly (not accounting for other obstacles)
+//todo: implement this
 int unblockedCorners(PVector startPoint, int[] obCoords) {
   if (obCoords[0] < startPoint.x && startPoint.x < obCoords[2] || obCoords[1] < startPoint.y && startPoint.y < obCoords[3])  // if a point can only directly go two points on a rectangle, it must be positioned in the cross extending off the rectangle
     return 2;
