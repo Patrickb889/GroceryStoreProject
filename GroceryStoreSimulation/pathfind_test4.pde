@@ -100,19 +100,25 @@ void pathFind(PVector start, PVector end) {
   
   // each step would involve each path moving forward by one line segment (max path length would go through each obstacle corner once)
   for (int step = -1; step < pathInfo.length - 1; step++) {
+    // Loop through indices of current last points of each path
     for (int[] index : currPoints) {
       int i = index[0];
       
       PVector currentPoint;
-        float dist;
-        if (i == 0) {
-          currentPoint = start;
-          dist = 0;
-        }
-        else {
-          currentPoint = cornerCoords(obstacles[(i - 1)/4])[(i - 1) % 4];
-          dist = pathInfo[step][i][0];
-        }
+      float dist;
+      
+      // Index 0 is always the start point
+      if (i == 0) {
+        currentPoint = start;
+        dist = 0;
+      }
+      
+      // otherwise, find coords of point and distance of path so far
+      else {
+        // Specific coords of a point
+        currentPoint = cornerCoords(obstacles[(i - 1)/4])[(i - 1) % 4];  // (i-1)/4 is the obstacle index (div by 4 because 4 corners per obstacle, -1 is to account for start point that is not part of any obstacle), (i-1)%4 is to find the index of the specific corner of the specific obstacle
+        dist = pathInfo[step][i][0];
+      }
         
       //todo (fix):
       //if (shortestDistancesCopy[i][0] != 0) {
@@ -126,26 +132,34 @@ void pathFind(PVector start, PVector end) {
       //  //float partialDist = dist(
       //}
           
+      // If no data in terms of optimal next steps from the current corner, create empty array and call function to get the required data
       if (viableNextSteps[i] == null) {
         viableNextSteps[i] = new int[0];
         
+        // Finds the corners that a point can directly go to which are part of obstacles that are in the way of the path going from the point directly to the destination
         getNextValidPoints(currentPoint, end, start, dist, i);
       }
       
+      // If data available already, no need to call function
       else {
+        // Loop through all optimal next corners
         for (int point : viableNextSteps[i]) {
-          if (shortestDistances[point][0] == 0)
-            continue;
+          //if (shortestDistances[point][0] == 0)
+          //  continue;
             
-          else {
-            PVector nextPoint = cornerCoords(obstacles[(point-1)/4])[(point-1) % 4];
-            float totalDist = dist + dist(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);
+          //else {
             
-            if (totalDist < shortestDistances[point][0]) {
-              shortestDistances[point][0] = totalDist;
-              shortestDistances[point][1] = i;
-            }
+          PVector nextPoint = cornerCoords(obstacles[(point-1)/4])[(point-1) % 4];  // Coords of the point
+          float totalDist = dist + dist(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);  // Distance of path including that point
+          
+          // If dist found is less than the current minimum distance to the point from the starting point, discard point from list of next points for the point that was originally though to be the best previous point
+          // then update shortestDistances according to the new previous point in the new path
+          if (totalDist < shortestDistances[point][0]) {
+            discard(viableNextSteps[(int) shortestDistances[point][1]], point);
+            shortestDistances[point][0] = totalDist;
+            shortestDistances[point][1] = i;  // i is index of the point with this point in its viableNextSteps array (the point right before this point)
           }
+          //}
         }
       }
     }
@@ -154,34 +168,41 @@ void pathFind(PVector start, PVector end) {
     if (nextPoints.size() == 0)
       break;
       
+    // Each iteration, update path info according to info found and stored in shortestDistances
     for (int[] index : nextPoints) {
       int i = index[0];
       pathInfo[step+1][i] = shortestDistances[i];
     }
     
+    // Next points become current points
     for (int i = 0; i < nextPoints.size(); i++) {
       currPoints.add(nextPoints.get(i));
     }
   }
   
+  // At this point, the optimal path has already been determined
   stroke(0, 255, 0);
   strokeWeight(3);
   //println(minIndex);
   int pathIndex = paths.size();
-  paths.add(new ArrayList<PVector>());
+  paths.add(new ArrayList<PVector>());  // Add ArrayList into paths which would contain all points in the path determined
   
+  // If minIndex <= 0, there were no obstacles at all from start to end
   if (minIndex <= 0) {
     //line(start.x, start.y, end.x, end.y);
     paths.get(pathIndex).add(new PVector(end.x, end.y));
     paths.get(pathIndex).add(new PVector(start.x, start.y));
   }
-  else {
+  
+  else {  // Otherwise, first add the last and second last points
     PVector p = cornerCoords(obstacles[(minIndex-1)/4])[(minIndex-1) % 4];
     //line(end.x, end.y, p.x, p.y);
     paths.get(pathIndex).add(new PVector(end.x, end.y));
     paths.get(pathIndex).add(new PVector(p.x, p.y));
   }
+  
   //PVector p1 = p;
+  // Loop through all points in path based on point indices stored in shortestDistances (in shortestDistances, each point would store the index of the previous point in the best path from start to itself)
   while (minIndex > 0) {
     PVector p1 = cornerCoords(obstacles[(minIndex-1)/4])[(minIndex-1) % 4];
     minIndex = (int) shortestDistances[minIndex][1];
@@ -236,6 +257,7 @@ void pathFind(PVector start, PVector end) {
   
 //}
 
+// Finds number of corners on an obstacle a point to get to directly (not accounting for other obstacles)
 int unblockedCorners(PVector startPoint, int[] obCoords) {
   if (obCoords[0] < startPoint.x && startPoint.x < obCoords[2] || obCoords[1] < startPoint.y && startPoint.y < obCoords[3])  // if a point can only directly go two points on a rectangle, it must be positioned in the cross extending off the rectangle
     return 2;
@@ -243,6 +265,7 @@ int unblockedCorners(PVector startPoint, int[] obCoords) {
     return 3;
 }
 
+// Returns list containing coords of corners given an obstacle
 PVector[] cornerCoords(int[] obsCoords) {
   //int numCorners = unblockedCorners(startPoint, obsCoords);
   PVector TL = new PVector(obsCoords[0], obsCoords[1]);  // Top left
@@ -252,11 +275,15 @@ PVector[] cornerCoords(int[] obsCoords) {
   
   return new PVector[]{TL, TR, BL, BR};
 }
-
+//tpdp: own pathfinding for all shoppers
+//todo: add second middle line for intersection finding
+//todo: user decides order if not time
+//todo: user can drag points
 
  //<>//
 //todo: figure out intersection not being caught (mostly positive slope lines)
 //figure out no intersections not being counted
+// Checks if an obstacle is intersected by a path (checks for intersection between line segments involved)
 boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoords) {
     int x1 = (int) startCoords.x;
     int y1 = (int) startCoords.y;
