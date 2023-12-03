@@ -16,7 +16,7 @@
 
 // INITIALIZATION
 ArrayList<PVector> nextSteps = new ArrayList<PVector>();
-int[][] obstacles = new int[][]{new int[]{675, 100, 700, 500}, new int[]{75, 250, 200, 375}, new int[]{75, 395, 200, 520}, new int[]{0, 100, 25, 300}, new int[]{0, 320, 35, 600}, new int[]{200, 565, 790, 600}, new int[]{150, 170, 280, 180}, new int[]{395, 365, 430, 475}, new int[]{300, 100, 310, 350}, new int[]{320, 100, 330, 350}, new int[]{340, 100, 350, 350}, new int[]{360, 100, 370, 350}, new int[]{380, 100, 390, 350}, new int[]{400, 100, 410, 350}, new int[]{450, 250, 550, 450}, new int[]{290, 390, 390, 500}, new int[]{250, 200, 260, 400}};//new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}};
+int[][] obstacles = new int[][]{new int[]{675, 100, 700, 500}, new int[]{75, 250, 200, 375}, new int[]{75, 395, 200, 520}, new int[]{0, 100, 25, 300}, new int[]{0, 320, 35, 599}, new int[]{200, 565, 790, 599}, new int[]{150, 170, 280, 180}, new int[]{395, 365, 430, 475}, new int[]{300, 100, 310, 350}, new int[]{320, 100, 330, 350}, new int[]{340, 100, 350, 350}, new int[]{360, 100, 370, 350}, new int[]{380, 100, 390, 350}, new int[]{400, 100, 410, 350}, new int[]{450, 250, 550, 450}, new int[]{290, 390, 390, 500}, new int[]{250, 200, 260, 400}};//new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}};
 int[][] viableNextSteps = new int[obstacles.length * 4 + 1][];  // viable next steps for each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
 float[][] shortestDistances = new float[obstacles.length * 4 + 1][2];  //index 0 is dist, index 1 is point index of point it came from to get that dist
 float[][] shortestDistancesCopy = new float[obstacles.length * 4 + 1][2];
@@ -99,7 +99,7 @@ void pathFind(PVector start, PVector end) {
   //todo: clean up stinky code
   
   // each step would involve each path moving forward by one line segment (max path length would go through each obstacle corner once)
-  for (int step = -1; step < pathInfo.length - 1; step++) {
+  for (int step = -1; step < pathInfo.length - 1; step++) { //<>//
     // Loop through indices of current last points of each path
     for (int[] index : currPoints) {
       int i = index[0];
@@ -177,7 +177,7 @@ void pathFind(PVector start, PVector end) {
     // Next points become current points
     for (int i = 0; i < nextPoints.size(); i++) {
       currPoints.add(nextPoints.get(i));
-    }
+    } //<>//
   }
   
   // At this point, the optimal path has already been determined
@@ -276,12 +276,98 @@ PVector[] cornerCoords(int[] obsCoords) {
   
   return new PVector[]{TL, TR, BL, BR};
 }
-//tpdp: own pathfinding for all shoppers
-//todo: add second middle line for intersection finding
+
+
+PVector[] relevantCornerCoords(PVector startPoint, int[] obsCoords) {
+  PVector[] corners = cornerCoords(obsCoords); //<>//
+  PVector[] relevantCorners = new PVector[4];
+  int numReachable = unblockedCorners(startPoint, obsCoords);
+  
+  int[] selectedIndices = new int[]{-1, -1};
+  //PVector[] selectedCorners = new PVector[2];
+  
+  if (numReachable == 2) {
+    if (obsCoords[0] < startPoint.x && startPoint.x < obsCoords[2]) {
+      if (startPoint.y <= obsCoords[1])
+        selectedIndices = new int[]{0, 1};
+      else
+        selectedIndices = new int[]{2, 3};
+    }
+    
+    else if (obsCoords[1] < startPoint.y && startPoint.y < obsCoords[3]) {
+      if (startPoint.x <= obsCoords[0])
+        selectedIndices = new int[]{0, 2};
+      else
+        selectedIndices = new int[]{1, 3};
+    }
+    
+    for (int index : selectedIndices)
+      relevantCorners[index] = corners[index];
+
+      
+  }
+  
+  else {
+    //get middle two in terms of dist
+    float minDist = -1, maxDist = -1;
+    int minIndex = -1, maxIndex = -1;
+    PVector minCorner = new PVector();
+    PVector maxCorner = new PVector();
+    
+    for (int c = 0; c < 4; c++) {
+      PVector corner = corners[c];
+      float dist = dist(corner.x, corner.y, startPoint.x, startPoint.y);
+      
+      if (minDist == -1) {
+        minDist = dist;
+        minIndex = c;
+        minCorner = corner;
+        continue;
+      }
+      else if (maxDist == -1) {
+        if (dist >= minDist) {
+          maxDist = dist;
+          maxIndex = c;
+          maxCorner = corner;
+        } else {
+          maxDist = minDist;
+          maxIndex = minIndex;
+          maxCorner = minCorner;
+          minDist = dist;
+          minIndex = c;
+          minCorner = corner;
+        }
+        continue;
+      }
+      
+      
+      if (dist < minDist) {
+        relevantCorners[minIndex] = minCorner;
+        minDist = dist;
+        minIndex = c;
+        minCorner = corner;
+      } else if (dist > maxDist) {
+        relevantCorners[maxIndex] = maxCorner;
+        maxDist = dist;
+        maxIndex = c;
+        maxCorner = corner;
+      } else {
+        relevantCorners[c] = corner;
+      }
+        
+    }
+  }
+  //for (PVector c : relevantCorners)
+  //  println(c);
+  return relevantCorners;
+}
+
+//todo: own pathfinding for all shoppers
+//todo: add second middle line for intersection finding(done)
 //todo: user decides order if not time
 //todo: user can drag points
 
- //<>//
+
 //todo: figure out intersection not being caught (mostly positive slope lines)
 //figure out no intersections not being counted
 // Checks if an obstacle is intersected by a path (checks for intersection between line segments involved)
@@ -294,7 +380,7 @@ boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoord
     float m = (float) (y2-y1) / (x2-x1);
     float b = y2 - m*x2;
     
-    obsCoords = append(obsCoords, (x1+x2)/2);
+    obsCoords = concat(obsCoords, new int[]{(obsCoords[0]+obsCoords[2])/2, (obsCoords[1]+obsCoords[3])/2});
     
     for (int i = 0; i < obsCoords.length; i++) {
       int coord = obsCoords[i];
@@ -303,6 +389,7 @@ boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoord
       if (i % 2 == 0) {  //known coord is x-coordinate
         
         otherCoord = round(m*coord + b);
+        
         
         if (min(obsCoords[1], obsCoords[3]) < otherCoord && otherCoord < max(obsCoords[1], obsCoords[3]) && min(x1, x2) < coord && coord < max(x1, x2))
           return true;

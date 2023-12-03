@@ -26,7 +26,7 @@ boolean pathCalculated = false;
 
 ArrayList<ArrayList<PVector>> paths = new ArrayList<ArrayList<PVector>>();
 //PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
-PVector[] list = new PVector[]{entrance, new PVector(25, 200), new PVector(75, 250), new PVector(35, 460), new PVector(260, 200), new PVector(340, 300), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450), new PVector(675, 300), exit};
+PVector[] list = new PVector[]{entrance, new PVector(25, 200), new PVector(75, 250), new PVector(35, 460), new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450), new PVector(675, 300), exit};
 //todo: fix undefined slope or 0 slope cases for intersection checking
 //todo: instead of using PVector array for obstacles, create each as a fixture object and store in ArrayList<Fixture>
 
@@ -75,9 +75,12 @@ void draw() {
       //pathFind(new PVector(700, 500), new PVector(420, 300));
       //pathFind(new PVector(420, 300), new PVector(100, 150));
     //}
-    
+    //todo: fixture class implement
+    //todo: file stuff
+    //todo: function that converts corner index to coords
     for (int i = 1; i < list.length; i++) {
-      pathFind(list[i-1], list[i]);
+      //for (int j = i+1; j < list.length; j++)
+        pathFind(list[i-1], list[i]);
     }
     
     pathCalculated = true;

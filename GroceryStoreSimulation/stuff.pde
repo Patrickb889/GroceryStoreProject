@@ -1,6 +1,6 @@
 int[] potentialObs(PVector currPoint, PVector destination) {
-  int[] potentialObsX = widthRangeObsCheck[(int) min(currPoint.x, destination.x)][(int) max(currPoint.x, destination.x)];
-  int[] potentialObsY = heightRangeObsCheck[(int) min(currPoint.y, destination.y)][(int) max(currPoint.y, destination.y)];
+  int[] potentialObsX = widthRangeObsCheck[(int) min(currPoint.x, destination.x)][(int) max(min(currPoint.x, destination.x) + 1, max(currPoint.x, destination.x))];
+  int[] potentialObsY = heightRangeObsCheck[(int) min(currPoint.y, destination.y)][(int) max(min(currPoint.y, destination.y) + 1, max(currPoint.y, destination.y))];
   //println(potentialObsX);
   //println(potentialObsY);
   if (potentialObsX.length > potentialObsY.length)
@@ -37,7 +37,7 @@ boolean obsPresent(PVector destination, PVector currPoint) {  // checks whether 
 }
 
 void getNextValidPoints(PVector currPoint, PVector destination, PVector startingPoint, float distSoFar, int pointIndex) {
-  int[] potObs = potentialObs(currPoint, destination);
+  int[] potObs = potentialObs(currPoint, destination); //<>//
   if (pointIndex == 6) {
     //println("PPPPPPPPP");
     //println(potObs);
@@ -50,7 +50,7 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
   
   for (int i : potObs) {
     //println("B");
-    int[] obsCoords = obstacles[i];
+    int[] obsCoords = obstacles[i]; //<>//
     //println(i, "EEEE");
     //println(obsCoords);
     //if (i == 1) {
@@ -64,9 +64,12 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
       //}
       obsToDest += 1;
       //println("C");
-      PVector[] corners = cornerCoords(obsCoords);
-      for (int c = 0; c < 4; c++) {
+      PVector[] corners = relevantCornerCoords(currPoint, obsCoords);
+      for (int c = 0; c < 4; c++) { //<>//
         PVector corner = corners[c];
+        
+        if (corner == null)
+          continue;
         //if (pointIndex == 6) {
           //println("PPPPPPPPP");
           //println(pointIndex);
