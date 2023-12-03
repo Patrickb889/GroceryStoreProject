@@ -6,10 +6,23 @@ class Fixture {
   String[] products;  // list of products found on/in the fixture
   ArrayList<Item> items = new ArrayList<Item>();
   PVector defaultPoint;
+  int index = fixtures.size();
   color colour;
   
   
   // CONSTRUCTOR
+  // Entrance/exit
+  Fixture(PVector dp) {
+    this.defaultPoint = dp;
+    this.products = new String[0];
+    this.position = new int[0];
+    this.mainSideCoords = new int[0];
+    this.type = "Door";
+    this.name = "";
+    this.colour = color(0);
+  }
+  
+  // Default point determined
   Fixture(int[] p, int[] msc, String t, String n, String[] pr, color c, PVector dp) {
     this.position = p;
     this.mainSideCoords = msc;
@@ -20,6 +33,7 @@ class Fixture {
     this.defaultPoint = dp;
   }
   
+  // Default point not determined
   Fixture(int[] p, int[] msc, String t, String n, String[] pr, color c) {
     this.position = p;
     this.mainSideCoords = msc;
@@ -42,6 +56,9 @@ class Fixture {
   
   // METHODS
   void drawMe() {
+    if (this.position.length != 4)
+      return;
+      
     stroke(0);
     strokeWeight(1);
     fill(this.colour);

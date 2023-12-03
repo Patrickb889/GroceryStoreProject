@@ -1,3 +1,5 @@
+Door
+Door
 Counter
 Display
 Display

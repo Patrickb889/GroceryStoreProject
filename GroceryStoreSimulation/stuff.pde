@@ -1,6 +1,13 @@
 int[] potentialObs(PVector currPoint, PVector destination) {
+  
+  if (max(currPoint.x, destination.x) == 0 || min(currPoint.x, destination.x) == 799 || max(currPoint.y, destination.y) == 0 || min(currPoint.y, destination.y) == 599)
+    return new int[]{};
+    
   int[] potentialObsX = widthRangeObsCheck[(int) min(currPoint.x, destination.x)][(int) max(min(currPoint.x, destination.x) + 1, max(currPoint.x, destination.x))];
   int[] potentialObsY = heightRangeObsCheck[(int) min(currPoint.y, destination.y)][(int) max(min(currPoint.y, destination.y) + 1, max(currPoint.y, destination.y))];
+  
+  
+    
   //println(potentialObsX);
   //println(potentialObsY);
   if (potentialObsX.length > potentialObsY.length)
@@ -90,12 +97,12 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
             }
             if (pointIndex == 0) {
               PVector p1 = startingPoint;
-              PVector p2 = cornerCoords(obstacles[(cornerIndex-1)/4])[(cornerIndex-1) % 4];
+              PVector p2 = pointCoords(cornerIndex);
               line(p1.x, p1.y, p2.x, p2.y);
             }
             else {
-              PVector p1 = cornerCoords(obstacles[(pointIndex-1)/4])[(pointIndex-1) % 4];
-              PVector p2 = cornerCoords(obstacles[(cornerIndex-1)/4])[(cornerIndex-1) % 4];
+              PVector p1 = pointCoords(pointIndex);
+              PVector p2 = pointCoords(cornerIndex);
               line(p1.x, p1.y, p2.x, p2.y);
             }
             viableNextSteps[pointIndex] = append(viableNextSteps[pointIndex], cornerIndex);

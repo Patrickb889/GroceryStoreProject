@@ -1,5 +1,5 @@
 // File data arrays
-float[][] distances;
+float[][] allDistances;
 String[][] optimalPaths;
 //int[][] fixtureCoords;
 //int[][] mainSideCoords;
@@ -102,10 +102,12 @@ void saveStore() {
     outputs[0].println(storeNames[i]);
   }
   
-  //todo: determine if dists and paths need extra added before and after (to account for start and end points)
+  //todo: determine if dists and paths need extra added before and after (to account for start and end points)(done)(yes)
+  //outputs[1].println(join(str(allDistances[0]), ","));
+  //outputs[2].println(join(optimalPaths[0], ","));
   for (int i = 0; i < fixtures.size(); i++) {
-    // output println for distances[row]
-    // output println for paths[row]
+    outputs[1].println(join(str(allDistances[i]), ","));
+    outputs[2].println(join(optimalPaths[i], ","));
     outputs[3].println(join(str(fixtures.get(i).position), ","));
     outputs[4].println(join(str(fixtures.get(i).mainSideCoords), ","));
     outputs[5].println(fixtures.get(i).type);
@@ -131,6 +133,7 @@ void saveStore() {
 
 void load(String name) {
   loaded = true;
+  pathCalculated = true;
   storeName = name;
   
   String[] dists = loadStrings(storeName + "/distances.txt");
@@ -143,11 +146,15 @@ void load(String name) {
   String[] colours = loadStrings(storeName + "/colours.txt");
   String[] defPoints = loadStrings(storeName + "/default_points.txt");
   
+  int numFixtures = defPoints.length;
+  allDistances = new float[numFixtures][numFixtures];
+  optimalPaths = new String[numFixtures][numFixtures];
   
-  
-  for (int row = 0; row < coords.length; row++) {
-    //float[] currDists = float(split(dists[row], ","));
-    //String[] currPaths = split(paths[row], ",");
+  //allDistances[0] = float(split(dists[0], ","));
+  //optimalPaths[0] = split(paths[0], ",");
+  for (int row = 0; row < numFixtures; row++) {
+    float[] currDists = float(split(dists[row], ","));
+    String[] currPaths = split(paths[row], ",");
     int[] currCoords = int(split(coords[row], ","));
     int[] currMainSides = int(split(mainSides[row], ","));
     String currType = fixtureTypes[row];
@@ -161,8 +168,9 @@ void load(String name) {
     PVector currDefaultPoint = new PVector(defPointCoords[0], defPointCoords[1]);
     
     
-    //distances[row] = currDists;
-    //optimalPaths[row] = currPaths;
+    allDistances[row] = currDists;
+    optimalPaths[row] = currPaths;
+    
     fixtures.add(new Fixture(currCoords, currMainSides, currType, currName, currProducts, currColour, currDefaultPoint));
     
   }

@@ -26,8 +26,10 @@ void setup() {
   
   fill(0);
   textSize(30);
-  textAlign(CENTER);
-  text("Loading...", 400, 300);
+  textAlign(CENTER, CENTER);
+  text("Loading...", 400, 275);
+  textSize(15);
+  text("(First time will be slower)", 390, 325);
   
   for (int i = 0; i < 5; i++) {
     shoppers.add(new Shopper(entrance.x, entrance.y, random(0.5, 2), importedList));
@@ -46,6 +48,8 @@ void setup() {
   //fixtures.add(new Fixture(new int[]{75, 250, 200, 375}, new int[]{75, 250, 200, 250}, "Display", "Fruit", new String[]{"Oranges", "Apples", "Bananas", "Canteloupes"}, color(255, 255, 0)));
   //fixtures.add(new Fixture(new int[]{75, 395, 200, 520}, new int[]{75, 520, 200, 520}, "Display", "Vegetables", new String[]{"Cabbage", "Lettuce", "Broccoli", "Caufliflower"}, color(100, 255, 0)));
   //fixtures.add(new Fixture(new int[]{0, 100, 25, 300}, new int[]{25, 100, 25, 300}, "Shelf", "Vegetacles", new String[]{"Green beans", "Green onion", "Ginger", "Radish", "Spinach"}, color(100, 255, 0)));
+  //fixtures.add(new Fixture(entrance));
+  //fixtures.add(new Fixture(exit));
   //fixturePresets.get(6).newFixture(new int[]{675, 100, 725, 500}, new int[]{675, 100, 675, 500}, "Pharmacy", new String[]{"Medicine"});
   //fixturePresets.get(0).newFixture(new int[]{75, 250, 200, 375}, new int[]{75, 250, 200, 250}, new String[]{"Oranges", "Apples", "Bananas", "Canteloupes"});
   //fixturePresets.get(1).newFixture(new int[]{75, 395, 200, 520}, new int[]{75, 395, 200, 395}, new String[]{"Cabbage", "Lettuce", "Broccoli", "Caufliflower"});
@@ -54,18 +58,22 @@ void setup() {
   //fixturePresets.get(4).newFixture(new int[]{200, 565, 790, 599}, new int[]{200, 565, 790, 565}, new String[]{"Ground beef", "Steak", "Chicken wings", "Porkchops", "Kebabs", "Eggs"});
   //fixturePresets.get(5).newFixture(new int[]{290, 390, 390, 500}, new int[]{290, 390, 390, 390}, new String[]{"Cookies", "Muffins", "Cupcakes", "Bread", "Brownies", "Pie", "Cake"});
   load("Martin");  //demo saved store
-  obstacles = new int[fixtures.size()][4];
+  obstacles = new int[fixtures.size()-2][4];
   
   for (int i = 0; i < obstacles.length; i++) {
-    obstacles[i] = fixtures.get(i).position;
+    obstacles[i] = fixtures.get(i+2).position;
   }
   
   pointsList[0] = entrance;
+  pointsList[pointsList.length-1] = exit;
+  listPointFixtureIndices[0] = 0;
+  listPointFixtureIndices[listPointFixtureIndices.length-1] = 1;
   for (int i = 0; i < exampleShoppingList.length; i++) {
     PVector pos = findPosition(exampleShoppingList[i]);
     
     if (pos.x != -1) {
       pointsList[i+1] = pos;
+      listPointFixtureIndices[i+1] = int(pos.z);
     }
   }
   
@@ -73,19 +81,23 @@ void setup() {
 
 boolean pathCalculated = false;
 
-ArrayList<ArrayList<PVector>> paths = new ArrayList<ArrayList<PVector>>();
+ArrayList<ArrayList<int[]>> paths = new ArrayList<ArrayList<int[]>>();
 //PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
 //PVector[] list = new PVector[]{entrance, new PVector(25, 200), new PVector(75, 250), new PVector(35, 460), new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450), new PVector(675, 300), exit};
 String[] exampleShoppingList = {"Carrots", "Bananas", "Milk", "Butter", "Cake", "Eggs", "Medicine"};
-PVector[] pointsList = new PVector[exampleShoppingList.length + 1];
+PVector[] pointsList = new PVector[exampleShoppingList.length + 2];
+int[] listPointFixtureIndices = new int[exampleShoppingList.length + 2];  // index of fixture the point is associated with (but +2 so that entrance and exit can be 0 and 1
 
 
 
 PVector findPosition(String item) {
   for (Fixture f : fixtures) {
     for (String product : f.products) {
-      if (product.equals(item))
+      if (product.equals(item)) {
+        PVector position = f.defaultPoint;
+        position.z = f.index;
         return f.defaultPoint;
+      }
     }
   }
   return new PVector(-1, -1);
@@ -99,7 +111,93 @@ void draw() {
   //user.updateMe(800, 600);
   //user.drawMe();
   
-  if (showTextbox) { //<>//
+  //if (pathCalculated) {
+  //  println("EEEEEEEEEEEEEEEEEEEEEEEE");
+  //  for (int i = 0; i < optimalPaths.length; i++) {
+  //    for (int j = 0; j < optimalPaths[i].length; j++) {
+  //      println(optimalPaths[i][j]);
+  //    }
+  //  }
+  //}
+  
+  fill(255, 0, 0);
+  stroke(0);
+  strokeWeight(1);
+  for (Fixture f : fixtures)
+    f.drawMe();
+    
+  if (pathCalculated) {
+    stroke(0, 150, 255);
+    strokeWeight(3);
+    //println("EEEEEEEEEEEEEEEEEEEEEEEE");
+    //for (int i = 0; i < optimalPaths.length; i++) {
+    //  for (int j = 0; j < optimalPaths[i].length; j++) {
+    //    println(optimalPaths[i][j]);
+    //  }
+    //}
+    for (int pointIndex = 1; pointIndex < listPointFixtureIndices.length; pointIndex++) {
+      int ind1 = listPointFixtureIndices[pointIndex-1];
+      int ind2 = listPointFixtureIndices[pointIndex];
+      
+      if (ind1 == ind2)
+        continue;
+      //println(ind1, ind2); //<>//
+      //println(fixtures.get(5).defaultPoint);
+      String stringPath = optimalPaths[min(ind1, ind2)][max(ind1, ind2)];
+      //println(stringPath);
+      int[] path = int(split(stringPath, "-"));
+      
+      for (int i = 1; i < path.length; i++) {
+        int i1 = path[i-1];
+        int i2 = path[i];
+        PVector p1;
+        PVector p2;
+        
+        
+        p1 = pointCoords(i1);
+        p2 = pointCoords(i2);
+          
+        if (i == 1)
+          p1 = fixtures.get(i1).defaultPoint;
+        
+        if (i == path.length - 1)
+          p2 = fixtures.get(i2).defaultPoint;
+        
+        
+        line(p1.x, p1.y, p2.x, p2.y);
+      }
+    }
+  }
+  //for (ArrayList<int[]> path : paths) {
+  //  for (int i = 1; i < path.size(); i++) {
+  //    int i1 = path.get(i-1)[0];
+  //    int i2 = path.get(i)[0];
+  //    PVector p1;
+  //    PVector p2;
+      
+      
+  //    p1 = pointCoords(i1);
+  //    p2 = pointCoords(i2);
+        
+  //    if (i == 1)
+  //      p1 = pointsList[i1];
+      
+  //    if (i == path.size() - 1)
+  //      p2 = pointsList[i2];
+      
+      
+  //    line(p1.x, p1.y, p2.x, p2.y); //<>//
+  //  }
+  //}
+  
+  fill(0, 0, 255);
+  stroke(0);
+  strokeWeight(1);
+  for (PVector point : pointsList)
+    circle(point.x, point.y, 8);
+
+
+  if (showTextbox) {
     strokeWeight(3);
     fill(200);
     rect(300, 250, 200, 100);
@@ -118,29 +216,6 @@ void draw() {
       
     text(textboxText + cursor, 325, 300);
   }
-
-  
-  fill(255, 0, 0);
-  stroke(0);
-  strokeWeight(1);
-  for (Fixture f : fixtures)
-    f.drawMe();
-    
-    
-  stroke(0, 150, 255);
-  strokeWeight(3);
-  for (ArrayList<PVector> ap : paths) {
-    for (int i = 1; i < ap.size(); i++) {
-      line(ap.get(i-1).x, ap.get(i-1).y, ap.get(i).x, ap.get(i).y);
-    }
-  }
-  
-  fill(0, 0, 255);
-  stroke(0);
-  strokeWeight(1);
-  for (PVector point : pointsList)
-    circle(point.x, point.y, 8);
-
   // todo (fix):
   //pathFind(new PVector(700, 500), new PVector(round(random(0, 100)), round(random(0, 599))));
   //shortestDistancesCopy = new float[obstacles.length * 4 + 1][2];
@@ -181,10 +256,23 @@ void draw() {
     //  name will then be saved to file in same folder as program
     //  store info will be saved to folder with same name as store
     //todo: function that converts corner index to coords
-    for (int i = 1; i < pointsList.length; i++) {
-      //for (int j = i+1; j < list.length; j++)
-        pathFind(pointsList[i-1], pointsList[i]);
+    
+    int numFixtures = fixtures.size();
+    allDistances = new float[numFixtures][numFixtures];
+    optimalPaths = new String[numFixtures][numFixtures];
+
+    for (int i = 0; i < numFixtures; i++) {
+      for (int j = i+1; j < numFixtures; j++) {
+        PVector p1 = fixtures.get(i).defaultPoint;
+        PVector p2 = fixtures.get(j).defaultPoint;
+          
+        String[] pathInfo = pathFind(p1, p2, i, j);
+        
+        allDistances[i][j] = float(pathInfo[0]);
+        optimalPaths[i][j] = pathInfo[1];
+      }
     }
+
     
     pathCalculated = true;
   }

@@ -39,7 +39,7 @@ float minDist = -1;
 int minIndex = -1;
 
 
-void pathFind(PVector start, PVector end) {
+String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   // reinitialize all variables and lists
   nextSteps = new ArrayList<PVector>();
   viableNextSteps = new int[obstacles.length * 4 + 1][];  // viable next steps for each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
@@ -116,7 +116,7 @@ void pathFind(PVector start, PVector end) {
       // otherwise, find coords of point and distance of path so far
       else {
         // Specific coords of a point
-        currentPoint = cornerCoords(obstacles[(i - 1)/4])[(i - 1) % 4];  // (i-1)/4 is the obstacle index (div by 4 because 4 corners per obstacle, -1 is to account for start point that is not part of any obstacle), (i-1)%4 is to find the index of the specific corner of the specific obstacle
+        currentPoint = pointCoords(i);
         dist = pathInfo[step][i][0];
       }
         
@@ -149,7 +149,7 @@ void pathFind(PVector start, PVector end) {
             
           //else {
             
-          PVector nextPoint = cornerCoords(obstacles[(point-1)/4])[(point-1) % 4];  // Coords of the point
+          PVector nextPoint = pointCoords(point);  // Coords of the point
           float totalDist = dist + dist(nextPoint.x, nextPoint.y, currentPoint.x, currentPoint.y);  // Distance of path including that point
           
           // If dist found is less than the current minimum distance to the point from the starting point, discard point from list of next points for the point that was originally though to be the best previous point
@@ -185,40 +185,49 @@ void pathFind(PVector start, PVector end) {
   strokeWeight(3);
   //println(minIndex);
   int pathIndex = paths.size();
-  paths.add(new ArrayList<PVector>());  // Add ArrayList into paths which would contain all points in the path determined
+  paths.add(new ArrayList<int[]>());  // Add ArrayList into paths which would contain all points in the path determined
+  
+  float totalDistance = 0;
   
   // If minIndex <= 0, there were no obstacles at all from start to end
   if (minIndex <= 0) {
     //line(start.x, start.y, end.x, end.y);
-    paths.get(pathIndex).add(new PVector(end.x, end.y));
-    paths.get(pathIndex).add(new PVector(start.x, start.y));
+    paths.get(pathIndex).add(new int[]{endIndex});
+    paths.get(pathIndex).add(new int[]{startIndex});
+    totalDistance = dist(start.x, start.y, end.x, end.y);
   }
   
   else {  // Otherwise, first add the last and second last points
-    PVector p = cornerCoords(obstacles[(minIndex-1)/4])[(minIndex-1) % 4];
+    PVector p = pointCoords(minIndex);
+    totalDistance = dist(p.x, p.y, end.x, end.y);
     //line(end.x, end.y, p.x, p.y);
-    paths.get(pathIndex).add(new PVector(end.x, end.y));
-    paths.get(pathIndex).add(new PVector(p.x, p.y));
+    paths.get(pathIndex).add(new int[]{endIndex});
+    paths.get(pathIndex).add(new int[]{minIndex});
+    
   }
   
   //PVector p1 = p;
   // Loop through all points in path based on point indices stored in shortestDistances (in shortestDistances, each point would store the index of the previous point in the best path from start to itself)
   while (minIndex > 0) {
-    PVector p1 = cornerCoords(obstacles[(minIndex-1)/4])[(minIndex-1) % 4];
+    PVector p1 = pointCoords(minIndex);
     minIndex = (int) shortestDistances[minIndex][1];
     if (minIndex == 0) {
       //line(p1.x, p1.y, start.x, start.y);
-      paths.get(pathIndex).add(new PVector(start.x, start.y));
+      totalDistance += dist(p1.x, p1.y, start.x, start.y);
+      paths.get(pathIndex).add(new int[]{startIndex});
       break;
     }
       
-    PVector p2 = cornerCoords(obstacles[(minIndex-1)/4])[(minIndex-1) % 4];
+    PVector p2 = pointCoords(minIndex);
     
     //line(p1.x, p1.y, p2.x, p2.y);
-    paths.get(pathIndex).add(new PVector(p2.x, p2.y));
+    totalDistance += dist(p1.x, p1.y, p2.x, p2.y);
+    paths.get(pathIndex).add(new int[]{minIndex});
   }
   stroke(0);
   strokeWeight(1);
+  
+  return new String[]{str(totalDistance), pathToString(paths.get(pathIndex))};
   //println(shortestDistances[3]);
   
 }
