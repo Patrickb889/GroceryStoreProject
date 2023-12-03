@@ -103,8 +103,8 @@ PVector findPosition(String item) {
   return new PVector(-1, -1);
 }
 
-//todo: fix undefined slope or 0 slope cases for intersection checking
-//todo: instead of using PVector array for obstacles, create each as a fixture object and store in ArrayList<Fixture>
+//todo: fix undefined slope or 0 slope cases for intersection checking(done)
+//todo: instead of using PVector array for obstacles, create each as a fixture object and store in ArrayList<Fixture>(done)
 
 void draw() {
   background(173, 176, 186);
@@ -233,9 +233,10 @@ void draw() {
       //pathFind(new PVector(700, 500), new PVector(420, 300));
       //pathFind(new PVector(420, 300), new PVector(100, 150));
     //}
-    //todo: fixture class implement
-    //todo: file stuff (need to store objects and distances as well as paths)
-    //todo: figure out way to store distances and paths
+    //todo: fixture class implement(done)
+    //todo: file stuff (need to store objects and distances as well as paths)(done)
+    //todo: figure out way to store distances and paths(done)
+    //todo: tsp greedy approximation
     //todo: customization (when fixture moved or resized or rotated, obstacles and pointsList need to be updated as well an pathCalculated should be set to false)
     //      click on fixture to select, when selected, default edge will be highlighted in diff colour and with thicker line, top left corner will have circle around it, also default point with have circle around it (default point circle will be diff colour)
     //      click on main body to set move to true, on top left to set resize to true, on default point to set moveDefaultPoint to true
