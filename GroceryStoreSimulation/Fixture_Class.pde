@@ -10,6 +10,16 @@ class Fixture {
   
   
   // CONSTRUCTOR
+  Fixture(int[] p, int[] msc, String t, String n, String[] pr, color c, PVector dp) {
+    this.position = p;
+    this.mainSideCoords = msc;
+    this.type = t;
+    this.name = n;
+    this.products = pr;
+    this.colour = c;
+    this.defaultPoint = dp;
+  }
+  
   Fixture(int[] p, int[] msc, String t, String n, String[] pr, color c) {
     this.position = p;
     this.mainSideCoords = msc;

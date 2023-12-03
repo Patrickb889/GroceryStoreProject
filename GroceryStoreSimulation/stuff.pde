@@ -37,7 +37,7 @@ boolean obsPresent(PVector destination, PVector currPoint) {  // checks whether 
 }
 
 void getNextValidPoints(PVector currPoint, PVector destination, PVector startingPoint, float distSoFar, int pointIndex) {
-  int[] potObs = potentialObs(currPoint, destination); //<>//
+  int[] potObs = potentialObs(currPoint, destination);
   if (pointIndex == 6) {
     //println("PPPPPPPPP");
     //println(potObs);
@@ -50,7 +50,7 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
   
   for (int i : potObs) {
     //println("B");
-    int[] obsCoords = obstacles[i]; //<>//
+    int[] obsCoords = obstacles[i];
     //println(i, "EEEE");
     //println(obsCoords);
     //if (i == 1) {
@@ -65,7 +65,7 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
       obsToDest += 1;
       //println("C");
       PVector[] corners = relevantCornerCoords(currPoint, obsCoords);
-      for (int c = 0; c < 4; c++) { //<>//
+      for (int c = 0; c < 4; c++) {
         PVector corner = corners[c];
         
         if (corner == null)

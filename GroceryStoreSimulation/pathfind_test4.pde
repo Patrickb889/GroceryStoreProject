@@ -177,7 +177,7 @@ void pathFind(PVector start, PVector end) {
     // Next points become current points
     for (int i = 0; i < nextPoints.size(); i++) {
       currPoints.add(nextPoints.get(i));
-    } //<>//
+    } //<>// //<>//
   }
   
   // At this point, the optimal path has already been determined
@@ -437,14 +437,4 @@ boolean pathToCorner(PVector cornerCoords, PVector initialCoords, int obIndex) {
   //println(ob);
   //println(newX, newY, "DDDDDDDDDDDDDDDDDDDDDDD");
   return ob[0] < newX && newX < ob[2] && ob[1] < newY && newY < ob[3];
-}
-
-
-boolean in(int[] array, int element) {
-  for (int el : array) {
-    if (el == element)
-      return true;
-  }
-  
-  return false;
 }
