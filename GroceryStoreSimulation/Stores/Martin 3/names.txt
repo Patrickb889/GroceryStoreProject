@@ -1,0 +1,9 @@
+
+
+Pharmacy
+Fruit
+Veggies (Display)
+Veggies (Shelf)
+Dairy
+Meat
+Baked Goods

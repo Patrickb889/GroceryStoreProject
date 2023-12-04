@@ -1,0 +1,9 @@
+Door
+Door
+Counter
+Display
+Display
+Shelf
+Fridge
+Fridge
+Display

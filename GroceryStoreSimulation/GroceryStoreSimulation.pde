@@ -1,7 +1,12 @@
 // File data arrays
 String[] storeNames;
-//test
 
+
+class QueuedFunction {
+  void call() {}
+}
+
+QueuedFunction queuedFunction = null;
 
 PVector entrance = new PVector(0, 0);
 PVector exit = new PVector(100, 0);
@@ -61,7 +66,7 @@ void setup() {
   //fixturePresets.get(3).newFixture(new int[]{0, 320, 35, 599}, new int[]{35, 320, 35, 599}, new String[]{"Milk", "Yogurt", "Cheese", "Butter", "Ice cream"});
   //fixturePresets.get(4).newFixture(new int[]{200, 565, 790, 599}, new int[]{200, 565, 790, 565}, new String[]{"Ground beef", "Steak", "Chicken wings", "Porkchops", "Kebabs", "Eggs"});
   //fixturePresets.get(5).newFixture(new int[]{290, 390, 390, 500}, new int[]{290, 390, 390, 390}, new String[]{"Cookies", "Muffins", "Cupcakes", "Bread", "Brownies", "Pie", "Cake"});
-  load("Martin 2");  //demo saved store
+  load("Martin 3");  //demo saved store
   obstacles = new int[fixtures.size()-2][4];
   //for (Fixture f : fixtures)
   //  println(f.stock, f.maxStock, f.urgency, f.type);
@@ -161,7 +166,7 @@ void draw() {
       int ind1 = requiredPoints[pointIndex-1];
       int ind2 = requiredPoints[pointIndex];
       
- //<>//
+ //<>// //<>//
       String stringPath = optimalPaths[min(ind1, ind2)][max(ind1, ind2)];
       int[] path = int(split(stringPath, "-"));
       
@@ -186,7 +191,7 @@ void draw() {
       }
     }
   }
- //<>//
+ //<>// //<>//
   
   fill(0, 0, 255);
   stroke(0);
