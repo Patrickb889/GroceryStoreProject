@@ -18,11 +18,22 @@ ArrayList<FixturePreset> fixturePresets = new ArrayList<FixturePreset>();
 int[][] obstacles = new int[0][4];
 //int[][] obstacles = new int[][]{new int[]{675, 100, 700, 500}, new int[]{75, 250, 200, 375}, new int[]{75, 395, 200, 520}, new int[]{0, 100, 25, 300}, new int[]{0, 320, 35, 599}, new int[]{200, 565, 790, 599}, new int[]{150, 170, 280, 180}, new int[]{395, 365, 430, 475}, new int[]{300, 100, 310, 350}, new int[]{320, 100, 330, 350}, new int[]{340, 100, 350, 350}, new int[]{360, 100, 370, 350}, new int[]{380, 100, 390, 350}, new int[]{400, 100, 410, 350}, new int[]{450, 250, 550, 450}, new int[]{290, 390, 390, 500}, new int[]{250, 200, 260, 400}};
 
+String[] shoppingList;
+
 void setup() {
   size(800, 600);
   frameRate(40);
   
-  storeNames = loadStrings("store_names.txt");
+  storeNames = loadStrings("Stores/store_names.txt");
+  shoppingList = loadStrings("ShoppingList/shopping_list.txt");
+  
+  if (shoppingList == null) {
+    println("No shopping list found! To make a shopping list, enter your items into a text file with each individual item on a new line. Name this file 'shopping_list' and place it in the folder called 'ShoppingList'");
+    shoppingList = new String[]{};
+  }
+  
+  pointsList = new PVector[shoppingList.length + 2];
+  listPointFixtureIndices = new int[shoppingList.length + 2];
   
   fill(0);
   textSize(30);
@@ -68,26 +79,52 @@ void setup() {
   pointsList[pointsList.length-1] = exit;
   listPointFixtureIndices[0] = 0;
   listPointFixtureIndices[listPointFixtureIndices.length-1] = 1;
-  for (int i = 0; i < exampleShoppingList.length; i++) {
-    PVector pos = findPosition(exampleShoppingList[i]);
+  for (int i = 0; i < shoppingList.length; i++) {
+    PVector pos = findPosition(shoppingList[i]);
     
     if (pos.x != -1) {
       pointsList[i+1] = pos;
       listPointFixtureIndices[i+1] = int(pos.z);
     }
+    
+    else {  // if pos.x is -1, then the function was unable to find the item in any of the fixtures
+      println("Sorry,", "'" + shoppingList[i] + "'", "is not a product in this store. Perhaps you made a typo in your shopping list?");
+      pointsList[i+1] = pointsList[i];
+      listPointFixtureIndices[i+1] = listPointFixtureIndices[i];
+    }
+      
   }
+  
+  fixtureCounter = new boolean[fixtures.size()];
+  requiredPoints = new int[0];
+  for (int i = 1; i < listPointFixtureIndices.length - 1; i++) {
+    int fixtureIndex = listPointFixtureIndices[i];
+    
+    if (!fixtureCounter[fixtureIndex]) {
+      fixtureCounter[fixtureIndex] = true;
+      requiredPoints = append(requiredPoints, fixtureIndex);
+    }
+  }
+  
+  for (int pathLength = 0; pathLength < requiredPoints.length - 1; pathLength++) {  // only pointsList.size() - 1 iterations because between the last two points not counting the exit, if one is chosen, the other has to be last (no need to check what is already known)
+    search(pathLength);
+  }
+  
+  //println(requiredPoints);
+  requiredPoints = concat(new int[]{0}, append(requiredPoints, 1));
   
 }
 
 boolean pathCalculated = false;
 
+boolean[] fixtureCounter;  // keeps track of all the fixtures that need to be visited in the path
 ArrayList<ArrayList<int[]>> paths = new ArrayList<ArrayList<int[]>>();
 //PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
 //PVector[] list = new PVector[]{entrance, new PVector(25, 200), new PVector(75, 250), new PVector(35, 460), new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450), new PVector(675, 300), exit};
-String[] exampleShoppingList = {"Carrots", "Bananas", "Milk", "Butter", "Cake", "Eggs", "Medicine"};
-PVector[] pointsList = new PVector[exampleShoppingList.length + 2];
-int[] listPointFixtureIndices = new int[exampleShoppingList.length + 2];  // index of fixture the point is associated with (but +2 so that entrance and exit can be 0 and 1
-
+//String[] exampleShoppingList = {"Carrots", "Bananas", "Milk", "Butter", "Cake", "Eggs", "Medicine"};
+PVector[] pointsList;
+int[] listPointFixtureIndices;  // index of fixture the point is associated with (but +2 so that entrance and exit can be 0 and 1
+int[] requiredPoints;
 
 
 PVector findPosition(String item) {
@@ -135,12 +172,12 @@ void draw() {
     //    println(optimalPaths[i][j]);
     //  }
     //}
-    for (int pointIndex = 1; pointIndex < listPointFixtureIndices.length; pointIndex++) {
-      int ind1 = listPointFixtureIndices[pointIndex-1];
-      int ind2 = listPointFixtureIndices[pointIndex];
+    for (int pointIndex = 1; pointIndex < requiredPoints.length; pointIndex++) {
+      int ind1 = requiredPoints[pointIndex-1];
+      int ind2 = requiredPoints[pointIndex];
       
-      if (ind1 == ind2)
-        continue;
+      //if (ind1 == ind2)
+      //  continue;
       //println(ind1, ind2); //<>//
       //println(fixtures.get(5).defaultPoint);
       String stringPath = optimalPaths[min(ind1, ind2)][max(ind1, ind2)];

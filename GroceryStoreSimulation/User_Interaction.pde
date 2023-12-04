@@ -26,9 +26,9 @@ void keyPressed() {
     saveStore();
   }
   
-  if (key == 's' && !showTextbox) {
-    initTextbox();
-  }
+  //if (key == 's' && !showTextbox) {
+  //  initTextbox();
+  //}
   
   if (keyCode == ENTER && showTextbox) {
     //textEntered = true;
@@ -41,14 +41,14 @@ void keyPressed() {
   if (keyCode == BACKSPACE && showTextbox && textboxText.length() > 0)
     textboxText = textboxText.substring(0, textboxText.length() - 1);
     
-  if (keyCode == 0 && showTextbox) { //<>//
+  if (keyCode == 0 && showTextbox) { //<>// //<>//
     println(str(key));
     textboxText += str(key);
   }
 }
 
 void initTextbox() {
-  showTextbox = true; //<>//
+  showTextbox = true; //<>// //<>//
   textboxLabel = "Store Name:";
   textboxText = "";
   
@@ -61,7 +61,7 @@ void initTextbox() {
 }
 
 void saveStore() {
-  saveQueued = false; //<>//
+  saveQueued = false; //<>// //<>//
   if (!loaded) {
     if (storeName.equals("Untitled") && textboxText.equals("")) {
       saveQueued = true;
@@ -87,16 +87,16 @@ void saveStore() {
   
   PrintWriter[] outputs = new PrintWriter[10];
   
-  outputs[0] = createWriter("store_names.txt");
-  outputs[1] = createWriter(storeName + "/distances.txt");
-  outputs[2] = createWriter(storeName + "/paths.txt");
-  outputs[3] = createWriter(storeName + "/coords.txt");
-  outputs[4] = createWriter(storeName + "/main_sides.txt");
-  outputs[5] = createWriter(storeName + "/types.txt");
-  outputs[6] = createWriter(storeName + "/names.txt");
-  outputs[7] = createWriter(storeName + "/products.txt");
-  outputs[8] = createWriter(storeName + "/colours.txt");
-  outputs[9] = createWriter(storeName + "/default_points.txt");
+  outputs[0] = createWriter("Stores/store_names.txt");
+  outputs[1] = createWriter("Stores/" + storeName + "/distances.txt");
+  outputs[2] = createWriter("Stores/" + storeName + "/paths.txt");
+  outputs[3] = createWriter("Stores/" + storeName + "/coords.txt");
+  outputs[4] = createWriter("Stores/" + storeName + "/main_sides.txt");
+  outputs[5] = createWriter("Stores/" + storeName + "/types.txt");
+  outputs[6] = createWriter("Stores/" + storeName + "/names.txt");
+  outputs[7] = createWriter("Stores/" + storeName + "/products.txt");
+  outputs[8] = createWriter("Stores/" + storeName + "/colours.txt");
+  outputs[9] = createWriter("Stores/" + storeName + "/default_points.txt");
   
   for (int i = 0; i < storeNames.length; i++) {
     outputs[0].println(storeNames[i]);
@@ -136,15 +136,15 @@ void load(String name) {
   pathCalculated = true;
   storeName = name;
   
-  String[] dists = loadStrings(storeName + "/distances.txt");
-  String[] paths = loadStrings(storeName + "/paths.txt");
-  String[] coords = loadStrings(storeName + "/coords.txt");
-  String[] mainSides = loadStrings(storeName + "/main_sides.txt");
-  String[] fixtureTypes = loadStrings(storeName + "/types.txt");
-  String[] fixtureNames = loadStrings(storeName + "/names.txt");
-  String[] products = loadStrings(storeName + "/products.txt");
-  String[] colours = loadStrings(storeName + "/colours.txt");
-  String[] defPoints = loadStrings(storeName + "/default_points.txt");
+  String[] dists = loadStrings("Stores/" + storeName + "/distances.txt");
+  String[] paths = loadStrings("Stores/" + storeName + "/paths.txt");
+  String[] coords = loadStrings("Stores/" + storeName + "/coords.txt");
+  String[] mainSides = loadStrings("Stores/" + storeName + "/main_sides.txt");
+  String[] fixtureTypes = loadStrings("Stores/" + storeName + "/types.txt");
+  String[] fixtureNames = loadStrings("Stores/" + storeName + "/names.txt");
+  String[] products = loadStrings("Stores/" + storeName + "/products.txt");
+  String[] colours = loadStrings("Stores/" + storeName + "/colours.txt");
+  String[] defPoints = loadStrings("Stores/" + storeName + "/default_points.txt");
   
   int numFixtures = defPoints.length;
   allDistances = new float[numFixtures][numFixtures];

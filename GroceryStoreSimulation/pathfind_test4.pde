@@ -99,7 +99,7 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   //todo: clean up stinky code
   
   // each step would involve each path moving forward by one line segment (max path length would go through each obstacle corner once)
-  for (int step = -1; step < pathInfo.length - 1; step++) { //<>//
+  for (int step = -1; step < pathInfo.length - 1; step++) { //<>// //<>//
     // Loop through indices of current last points of each path
     for (int[] index : currPoints) {
       int i = index[0];
@@ -177,7 +177,7 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
     // Next points become current points
     for (int i = 0; i < nextPoints.size(); i++) {
       currPoints.add(nextPoints.get(i));
-    } //<>// //<>//
+    } //<>// //<>// //<>//
   }
   
   // At this point, the optimal path has already been determined
@@ -288,7 +288,7 @@ PVector[] cornerCoords(int[] obsCoords) {
 
 
 PVector[] relevantCornerCoords(PVector startPoint, int[] obsCoords) {
-  PVector[] corners = cornerCoords(obsCoords); //<>//
+  PVector[] corners = cornerCoords(obsCoords); //<>// //<>//
   PVector[] relevantCorners = new PVector[4];
   int numReachable = unblockedCorners(startPoint, obsCoords);
   

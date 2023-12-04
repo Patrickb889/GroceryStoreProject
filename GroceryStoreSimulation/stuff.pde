@@ -28,7 +28,7 @@ boolean obsPresent(PVector destination, PVector currPoint) {  // checks whether 
     //println(destination);
     //println(obstacles[i]);
     //println(currPoint);
-    //if (destination.x == 450 && destination.y == 450 && currPoint.x == 390 && currPoint.y == 400) //<>//
+    //if (destination.x == 450 && destination.y == 450 && currPoint.x == 390 && currPoint.y == 400) //<>// //<>//
     //println(intersectionFound(obstacles[i], currPoint, destination));
     //println(pathToCorner(currPoint, destination));
     if (intersectionFound(obstacles[i], currPoint, destination)) {
