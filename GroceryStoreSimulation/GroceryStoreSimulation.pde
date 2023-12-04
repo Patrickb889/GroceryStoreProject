@@ -225,8 +225,8 @@ void draw() {
     //todo: fixture class implement(done)
     //todo: file stuff (need to store objects and distances as well as paths)(done)
     //todo: figure out way to store distances and paths(done)
-    //todo: tsp greedy approximation
-    //todo: give each fixture an urgency factor based on stock of its items (priority gets multiplied by urgency to determine new priority)
+    //todo: tsp greedy approximation(done)
+    //todo: give each fixture an urgency factor based on stock of its items (priority gets multiplied by urgency to determine new priority)(done)
     //todo: customization (when fixture moved or resized or rotated, obstacles and pointsList need to be updated as well an pathCalculated should be set to false)
     //      click on fixture to select, when selected, default edge will be highlighted in diff colour and with thicker line, top left corner will have circle around it, also default point with have circle around it (default point circle will be diff colour)
     //      click on main body to set move to true, on top left to set resize to true, on default point to set moveDefaultPoint to true
