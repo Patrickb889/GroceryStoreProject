@@ -2,21 +2,17 @@
 String[] storeNames;
 
 
-//float enteranceX = 0;
-//float enteranceY = 0;
 PVector entrance = new PVector(0, 0);
 PVector exit = new PVector(100, 0);
 float userSpeed = 1;
 ArrayList<String> importedList = new ArrayList<String>();
 
 ArrayList<Shopper> shoppers = new ArrayList<Shopper>();
-//Shopper shopper = new Shopper(entrance.x, entrance.y, userSpeed, importedList);
 
 ArrayList<Fixture> fixtures = new ArrayList<Fixture>();
 ArrayList<FixturePreset> fixturePresets = new ArrayList<FixturePreset>();
 
 int[][] obstacles = new int[0][4];
-//int[][] obstacles = new int[][]{new int[]{675, 100, 700, 500}, new int[]{75, 250, 200, 375}, new int[]{75, 395, 200, 520}, new int[]{0, 100, 25, 300}, new int[]{0, 320, 35, 599}, new int[]{200, 565, 790, 599}, new int[]{150, 170, 280, 180}, new int[]{395, 365, 430, 475}, new int[]{300, 100, 310, 350}, new int[]{320, 100, 330, 350}, new int[]{340, 100, 350, 350}, new int[]{360, 100, 370, 350}, new int[]{380, 100, 390, 350}, new int[]{400, 100, 410, 350}, new int[]{450, 250, 550, 450}, new int[]{290, 390, 390, 500}, new int[]{250, 200, 260, 400}};
 
 String[] shoppingList;
 
@@ -46,19 +42,15 @@ void setup() {
     shoppers.add(new Shopper(entrance.x, entrance.y, random(0.5, 2), importedList));
   }
   
-  fixturePresets.add(new FixturePreset("Display", "Fruit", color(255, 255, 0)));
-  fixturePresets.add(new FixturePreset("Display", "Veggies (Display)", color(100, 255, 0)));
-  fixturePresets.add(new FixturePreset("Shelf", "Veggies (Shelf)", color(100, 255, 0)));
-  fixturePresets.add(new FixturePreset("Fridge", "Dairy", color(200, 200, 255)));
-  fixturePresets.add(new FixturePreset("Fridge", "Meat", color(255, 0, 0)));
-  fixturePresets.add(new FixturePreset("Display", "Baked Goods", color(177, 137, 75)));
-  fixturePresets.add(new FixturePreset("Counter", color(0, 255, 100)));
+  fixturePresets.add(new FixturePreset("Display", "Fruit", 200, 1/(frameRate*10), color(255, 255, 0)));
+  fixturePresets.add(new FixturePreset("Display", "Veggies (Display)", 200, 1/(frameRate*10), color(100, 255, 0)));
+  fixturePresets.add(new FixturePreset("Shelf", "Veggies (Shelf)", 400, 1/(frameRate*10), color(100, 255, 0)));
+  fixturePresets.add(new FixturePreset("Fridge", "Dairy", 30, 1/(frameRate*20), color(200, 200, 255)));
+  fixturePresets.add(new FixturePreset("Fridge", "Meat", 50, 1/(frameRate*15), color(255, 0, 0)));
+  fixturePresets.add(new FixturePreset("Display", "Baked Goods", 20, 1/(frameRate*30), color(177, 137, 75)));
+  fixturePresets.add(new FixturePreset("Counter", 1, 0, color(0, 255, 100)));
   
   //int[] p, int[] msc, String t, String n, String[] ctgs, color c
-  //fixtures.add(new Fixture(new int[]{675, 100, 725, 500}, new int[]{675, 100, 675, 500}, "Counter", "Pharmacy", new String[]{"Medicine"}, color(0, 255, 0)));
-  //fixtures.add(new Fixture(new int[]{75, 250, 200, 375}, new int[]{75, 250, 200, 250}, "Display", "Fruit", new String[]{"Oranges", "Apples", "Bananas", "Canteloupes"}, color(255, 255, 0)));
-  //fixtures.add(new Fixture(new int[]{75, 395, 200, 520}, new int[]{75, 520, 200, 520}, "Display", "Vegetables", new String[]{"Cabbage", "Lettuce", "Broccoli", "Caufliflower"}, color(100, 255, 0)));
-  //fixtures.add(new Fixture(new int[]{0, 100, 25, 300}, new int[]{25, 100, 25, 300}, "Shelf", "Vegetacles", new String[]{"Green beans", "Green onion", "Ginger", "Radish", "Spinach"}, color(100, 255, 0)));
   //fixtures.add(new Fixture(entrance));
   //fixtures.add(new Fixture(exit));
   //fixturePresets.get(6).newFixture(new int[]{675, 100, 725, 500}, new int[]{675, 100, 675, 500}, "Pharmacy", new String[]{"Medicine"});
@@ -68,9 +60,10 @@ void setup() {
   //fixturePresets.get(3).newFixture(new int[]{0, 320, 35, 599}, new int[]{35, 320, 35, 599}, new String[]{"Milk", "Yogurt", "Cheese", "Butter", "Ice cream"});
   //fixturePresets.get(4).newFixture(new int[]{200, 565, 790, 599}, new int[]{200, 565, 790, 565}, new String[]{"Ground beef", "Steak", "Chicken wings", "Porkchops", "Kebabs", "Eggs"});
   //fixturePresets.get(5).newFixture(new int[]{290, 390, 390, 500}, new int[]{290, 390, 390, 390}, new String[]{"Cookies", "Muffins", "Cupcakes", "Bread", "Brownies", "Pie", "Cake"});
-  load("Martin");  //demo saved store
+  load("Martin 2");  //demo saved store
   obstacles = new int[fixtures.size()-2][4];
-  
+  //for (Fixture f : fixtures)
+  //  println(f.stock, f.maxStock, f.urgency, f.type);
   for (int i = 0; i < obstacles.length; i++) {
     obstacles[i] = fixtures.get(i+2).position;
   }
@@ -106,12 +99,13 @@ void setup() {
     }
   }
   
-  for (int pathLength = 0; pathLength < requiredPoints.length - 1; pathLength++) {  // only pointsList.size() - 1 iterations because between the last two points not counting the exit, if one is chosen, the other has to be last (no need to check what is already known)
-    search(pathLength);
+  if (loaded) {
+    for (int pathLength = 0; pathLength < requiredPoints.length - 1; pathLength++) {  // only pointsList.size() - 1 iterations because between the last two points not counting the exit, if one is chosen, the other has to be last (no need to check what is already known)
+      search(pathLength);
+    }
+    
+    requiredPoints = concat(new int[]{0}, append(requiredPoints, 1));
   }
-  
-  //println(requiredPoints);
-  requiredPoints = concat(new int[]{0}, append(requiredPoints, 1));
   
 }
 
@@ -119,9 +113,7 @@ boolean pathCalculated = false;
 
 boolean[] fixtureCounter;  // keeps track of all the fixtures that need to be visited in the path
 ArrayList<ArrayList<int[]>> paths = new ArrayList<ArrayList<int[]>>();
-//PVector[] list = new PVector[]{entrance, new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450)};
-//PVector[] list = new PVector[]{entrance, new PVector(25, 200), new PVector(75, 250), new PVector(35, 460), new PVector(260, 200), new PVector(340, 225), new PVector(360, 225), new PVector(390, 390), new PVector(550, 450), new PVector(675, 300), exit};
-//String[] exampleShoppingList = {"Carrots", "Bananas", "Milk", "Butter", "Cake", "Eggs", "Medicine"};
+//String[] shoppingList = {"Carrots", "Bananas", "Milk", "Butter", "Cake", "Eggs", "Medicine"};
 PVector[] pointsList;
 int[] listPointFixtureIndices;  // index of fixture the point is associated with (but +2 so that entrance and exit can be 0 and 1
 int[] requiredPoints;
@@ -145,17 +137,6 @@ PVector findPosition(String item) {
 
 void draw() {
   background(173, 176, 186);
-  //user.updateMe(800, 600);
-  //user.drawMe();
-  
-  //if (pathCalculated) {
-  //  println("EEEEEEEEEEEEEEEEEEEEEEEE");
-  //  for (int i = 0; i < optimalPaths.length; i++) {
-  //    for (int j = 0; j < optimalPaths[i].length; j++) {
-  //      println(optimalPaths[i][j]);
-  //    }
-  //  }
-  //}
   
   fill(255, 0, 0);
   stroke(0);
@@ -164,24 +145,23 @@ void draw() {
     f.drawMe();
     
   if (pathCalculated) {
+    if (requiredPoints[0] != 0) {
+      for (int pathLength = 0; pathLength < requiredPoints.length - 1; pathLength++) {  // only pointsList.size() - 1 iterations because between the last two points not counting the exit, if one is chosen, the other has to be last (no need to check what is already known)
+        search(pathLength);
+      }
+      
+      requiredPoints = concat(new int[]{0}, append(requiredPoints, 1));
+    }
+  
     stroke(0, 150, 255);
     strokeWeight(3);
-    //println("EEEEEEEEEEEEEEEEEEEEEEEE");
-    //for (int i = 0; i < optimalPaths.length; i++) {
-    //  for (int j = 0; j < optimalPaths[i].length; j++) {
-    //    println(optimalPaths[i][j]);
-    //  }
-    //}
+
     for (int pointIndex = 1; pointIndex < requiredPoints.length; pointIndex++) {
       int ind1 = requiredPoints[pointIndex-1];
       int ind2 = requiredPoints[pointIndex];
       
-      //if (ind1 == ind2)
-      //  continue;
-      //println(ind1, ind2); //<>//
-      //println(fixtures.get(5).defaultPoint);
+ //<>//
       String stringPath = optimalPaths[min(ind1, ind2)][max(ind1, ind2)];
-      //println(stringPath);
       int[] path = int(split(stringPath, "-"));
       
       for (int i = 1; i < path.length; i++) {
@@ -205,27 +185,7 @@ void draw() {
       }
     }
   }
-  //for (ArrayList<int[]> path : paths) {
-  //  for (int i = 1; i < path.size(); i++) {
-  //    int i1 = path.get(i-1)[0];
-  //    int i2 = path.get(i)[0];
-  //    PVector p1;
-  //    PVector p2;
-      
-      
-  //    p1 = pointCoords(i1);
-  //    p2 = pointCoords(i2);
-        
-  //    if (i == 1)
-  //      p1 = pointsList[i1];
-      
-  //    if (i == path.size() - 1)
-  //      p2 = pointsList[i2];
-      
-      
-  //    line(p1.x, p1.y, p2.x, p2.y); //<>//
-  //  }
-  //}
+ //<>//
   
   fill(0, 0, 255);
   stroke(0);
@@ -262,18 +222,11 @@ void draw() {
   //}
   
   if (!pathCalculated) {
-    //for (int i = 0; i < 10; i++) {
-      //pathFind(new PVector(420, 300), new PVector(round(random(0, 100)), round(random(0, 599))));
-      //pathFind(new PVector(420, 300), new PVector(round(random(0, 799)), round(random(0, 70))));
-      //pathFind(new PVector(420, 300), new PVector(round(random(700, width)), round(random(0, 599))));
-      //pathFind(new PVector(420, 300), new PVector(round(random(500, height)), round(random(0, 600))));
-      //pathFind(new PVector(700, 500), new PVector(420, 300));
-      //pathFind(new PVector(420, 300), new PVector(100, 150));
-    //}
     //todo: fixture class implement(done)
     //todo: file stuff (need to store objects and distances as well as paths)(done)
     //todo: figure out way to store distances and paths(done)
     //todo: tsp greedy approximation
+    //todo: give each fixture an urgency factor based on stock of its items (priority gets multiplied by urgency to determine new priority)
     //todo: customization (when fixture moved or resized or rotated, obstacles and pointsList need to be updated as well an pathCalculated should be set to false)
     //      click on fixture to select, when selected, default edge will be highlighted in diff colour and with thicker line, top left corner will have circle around it, also default point with have circle around it (default point circle will be diff colour)
     //      click on main body to set move to true, on top left to set resize to true, on default point to set moveDefaultPoint to true

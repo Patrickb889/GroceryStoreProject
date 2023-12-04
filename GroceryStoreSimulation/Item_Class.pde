@@ -1,32 +1,43 @@
+float restockChance = 1/(frameRate*10);
+
 class Item {
   //Fields
-  PVector position;
-  Float size;
-  int stock;
-  String name, category;
-  color colour;
+  //PVector position;
+  int size;
+  int maxStock, stock;
+  String name;//, category;
+  //color colour;
+  Fixture container;
   
   //Constructor
-  Item(String n, String c, float s, int sto, color co) {
-   this.position = new PVector(); 
-   this.size = s;
-   this.stock = sto;
+  Item(String n, Fixture c) {
+   //this.position = new PVector(); 
+   this.size = round(random(10, 100));
+   this.maxStock = round(1000/this.size);
+   this.stock = round(random(0, maxStock));
    this.name = n;
-   this.category = c;
-   this.colour = co;
+   this.container = c;
+   //this.category = c;
+   //this.colour = co;
   }
   
   //Methods
   void grabbed(Shopper s) {
-   this.stock--; 
+   this.stock--;
+   this.container.urgency += 1./this.container.maxStock;
    s.cartSpace -= this.size;
    s.items.add(this);
   }
   
-  void placeItemInSpot(Fixture F) {
-    this.position.x = F.defaultPoint.x;
-    this.position.y = F.defaultPoint.y;
-    F.items.add(this);
-    //F.colour = this.colour;
+  //void placeItemInSpot(Fixture f) {
+  //  this.position.x = f.defaultPoint.x;
+  //  this.position.y = f.defaultPoint.y;
+  //  F.items.add(this);
+  //  //F.colour = this.colour;
+  //}
+  
+  void restock() {
+    float percent = random(0, 20);
+    //restock whatever percent of maxStock
   }
 }

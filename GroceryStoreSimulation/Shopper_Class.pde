@@ -51,4 +51,12 @@ class Shopper {
     strokeWeight(1);
     circle(this.position.x, this.position.y, 10);
   }
+  
+  void grabItem(Fixture f) {
+    if (f.type != "Counter") {
+      int numGrabbed = round(random(1, min(10, f.stock)));
+      f.stock -= numGrabbed;
+      f.urgency += float(numGrabbed)/f.maxStock;  // 1 - (n-x)/m = 1 - (n/m - x/m) = (1 - n/m) + x/m
+    }
+  }
 }

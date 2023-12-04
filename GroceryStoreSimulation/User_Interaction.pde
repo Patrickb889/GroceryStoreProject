@@ -41,14 +41,14 @@ void keyPressed() {
   if (keyCode == BACKSPACE && showTextbox && textboxText.length() > 0)
     textboxText = textboxText.substring(0, textboxText.length() - 1);
     
-  if (keyCode == 0 && showTextbox) { //<>// //<>//
+  if (keyCode == 0 && showTextbox) { //<>//
     println(str(key));
     textboxText += str(key);
   }
 }
 
 void initTextbox() {
-  showTextbox = true; //<>// //<>//
+  showTextbox = true; //<>//
   textboxLabel = "Store Name:";
   textboxText = "";
   
@@ -61,7 +61,7 @@ void initTextbox() {
 }
 
 void saveStore() {
-  saveQueued = false; //<>// //<>//
+  saveQueued = false; //<>//
   if (!loaded) {
     if (storeName.equals("Untitled") && textboxText.equals("")) {
       saveQueued = true;
@@ -85,7 +85,7 @@ void saveStore() {
   }
   
   
-  PrintWriter[] outputs = new PrintWriter[10];
+  PrintWriter[] outputs = new PrintWriter[12];
   
   outputs[0] = createWriter("Stores/store_names.txt");
   outputs[1] = createWriter("Stores/" + storeName + "/distances.txt");
@@ -95,8 +95,10 @@ void saveStore() {
   outputs[5] = createWriter("Stores/" + storeName + "/types.txt");
   outputs[6] = createWriter("Stores/" + storeName + "/names.txt");
   outputs[7] = createWriter("Stores/" + storeName + "/products.txt");
-  outputs[8] = createWriter("Stores/" + storeName + "/colours.txt");
-  outputs[9] = createWriter("Stores/" + storeName + "/default_points.txt");
+  outputs[8] = createWriter("Stores/" + storeName + "/max_stocks.txt");
+  outputs[9] = createWriter("Stores/" + storeName + "/restock_chances.txt");
+  outputs[10] = createWriter("Stores/" + storeName + "/colours.txt");
+  outputs[11] = createWriter("Stores/" + storeName + "/default_points.txt");
   
   for (int i = 0; i < storeNames.length; i++) {
     outputs[0].println(storeNames[i]);
@@ -113,12 +115,14 @@ void saveStore() {
     outputs[5].println(fixtures.get(i).type);
     outputs[6].println(fixtures.get(i).name);
     outputs[7].println(join(fixtures.get(i).products, ","));
+    outputs[8].println(str(fixtures.get(i).maxStock));
+    outputs[9].println(str(fixtures.get(i).restockChance));
     
     color c = fixtures.get(i).colour;
-    outputs[8].println(str(red(c)) + "," + str(green(c)) + "," + str(blue(c)));
+    outputs[10].println(str(red(c)) + "," + str(green(c)) + "," + str(blue(c)));
     
     PVector p = fixtures.get(i).defaultPoint;
-    outputs[9].println(str(p.x) + "," + str(p.y));
+    outputs[11].println(str(p.x) + "," + str(p.y));
   }
   
   for (int i = 0; i < outputs.length; i++) {
@@ -143,6 +147,8 @@ void load(String name) {
   String[] fixtureTypes = loadStrings("Stores/" + storeName + "/types.txt");
   String[] fixtureNames = loadStrings("Stores/" + storeName + "/names.txt");
   String[] products = loadStrings("Stores/" + storeName + "/products.txt");
+  String[] maxStocks = loadStrings("Stores/" + storeName + "/max_stocks.txt");
+  String[] restockChances = loadStrings("Stores/" + storeName + "/restock_chances.txt");
   String[] colours = loadStrings("Stores/" + storeName + "/colours.txt");
   String[] defPoints = loadStrings("Stores/" + storeName + "/default_points.txt");
   
@@ -160,6 +166,8 @@ void load(String name) {
     String currType = fixtureTypes[row];
     String currName = fixtureNames[row];
     String[] currProducts = split(products[row], ",");
+    int currMaxStock = int(maxStocks[row]);
+    float currRestockChance = float(restockChances[row]);
     
     float[] rgb = float(split(colours[row], ","));
     color currColour = color(rgb[0], rgb[1], rgb[2]);
@@ -171,7 +179,7 @@ void load(String name) {
     allDistances[row] = currDists;
     optimalPaths[row] = currPaths;
     
-    fixtures.add(new Fixture(currCoords, currMainSides, currType, currName, currProducts, currColour, currDefaultPoint));
+    fixtures.add(new Fixture(currCoords, currMainSides, currType, currName, currProducts, currMaxStock, currRestockChance, currColour, currDefaultPoint));
     
   }
 }
