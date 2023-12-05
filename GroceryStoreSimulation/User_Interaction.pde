@@ -24,6 +24,8 @@ String cursor = "";
 int selectedFixture = -1;
 int presetIndex;
 
+boolean recalcRequired = false;
+
 void keyPressed() {
   if (key == 'S' && !textbox.show && selectedFixture == -1) {
     saveStore();
@@ -101,34 +103,53 @@ void mousePressed() {
     
     for (Fixture f : fixtures) {
       if (fixtureClicked(f, clickX, clickY)) {
-        //if (mouseButton == RIGHT) {
-        //  requiredPoints = append(requiredPoints, f.index);
-        //  pointsList.add(fixtures.get(f.index).defaultPoint);
-        //  editMode = "Add point";  // Doesn't actually do anything, just lets program know that something major was modified
-        //  if (selectedFixture == -1)
-        //    recalculatePath();
-        //  return;
-        //}
-        
-        if (f.index == selectedFixture) {
-          if (dist(clickX, clickY, f.defaultPoint.x, f.defaultPoint.y) <= 8)
-            editMode = "Change default point";
-          else if (dist(clickX, clickY, f.position[0], f.position[1]) <= 12)
-            editMode = "Resize";
-          else
-            editMode = "Move";
+        if (mouseButton == RIGHT) {
+          //requiredPoints = append(requiredPoints, f.index);
+          //pointsList.add(fixtures.get(f.index).defaultPoint);
+          //editMode = "Add point";  // Doesn't actually do anything, just lets program know that something major was modified
+          //if (selectedFixture == -1)
+          //  recalculatePath();
           
-          return;
+          if (f.index != selectedFixture) {
+            Fixture thisF = fixtures.get(selectedFixture);
+            
+            thisF.colour = f.colour;
+            thisF.type = f.type;
+            thisF.name = f.name;
+            thisF.maxStock = f.maxStock;
+            thisF.restockChance = f.restockChance;
+            thisF.stock = min(thisF.stock, thisF.maxStock);
+            
+            return;
+          }
+
         }
         
-        else
-          tempFixture = f.index;
+        else {
+          if (f.index == selectedFixture) {
+            if (dist(clickX, clickY, f.defaultPoint.x, f.defaultPoint.y) <= 8)
+              editMode = "Change default point";
+            else if (dist(clickX, clickY, f.position[0], f.position[1]) <= 12)
+              editMode = "Resize";
+            else
+              editMode = "Move";
+              
+            recalcRequired = true;
+            
+            return;
+          }
+          
+          else
+            tempFixture = f.index;
+        }
           
       }
     }
-    
-    if (tempFixture == -1 && selectedFixture != -1 && !editMode.equals(""))
+    println(editMode);
+    if (recalcRequired) {
+      recalcRequired = false;
       recalculatePath();
+    }
     
     editMode = "";
     selectedFixture = tempFixture;
@@ -241,7 +262,7 @@ void addFixture() {
   println("New fixture added successfully! Save and restart the program to reiterate through your shopping list.");
   
   textbox.text = "";
-  editMode = "Add fixture";  // Doesn't do anything except let program know that major change has happened
+  recalcRequired = true;;  // Doesn't do anything except let program know that major change has happened
 }
 
 void renameFixture() {
