@@ -26,6 +26,8 @@ int presetIndex;
 
 boolean recalcRequired = false;
 
+boolean altHeld = false;
+
 void keyPressed() {
   if (key == 'S' && !textbox.show && selectedFixture == -1) {
     saveStore();
@@ -74,8 +76,15 @@ void keyPressed() {
     
   else if (key == 'A')
     addProducts();
+    
+  else if (keyCode == ALT)
+    altHeld = true;
 }
 
+void keyReleased() {
+  if (keyCode == ALT)
+    altHeld = false;
+}
 
 String editMode = "";  // "Move", "Resize", "Change default point"
 int clickX, clickY;
@@ -139,14 +148,21 @@ void mousePressed() {
             return;
           }
           
+          else if (altHeld) {
+            fixtures.get(selectedFixture).moveTo(f);
+            recalcRequired = true;
+            
+            return;
+          }
+          
           else
             tempFixture = f.index;
         }
           
       }
     }
-    println(editMode);
-    if (recalcRequired) {
+    //println(editMode);
+    if (recalcRequired && tempFixture == -1) {
       recalcRequired = false;
       recalculatePath();
     }

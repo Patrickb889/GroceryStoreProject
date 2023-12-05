@@ -147,6 +147,16 @@ class Fixture {
   }
   
   void move(int[] displacements) {
+    if (displacements[0] < 0)
+      displacements[0] = -min(this.position[0] - 1, -displacements[0]);
+    else
+      displacements[0] = min(width - this.position[2] - 1, displacements[0]);
+      
+    if (displacements[1] < 0)
+      displacements[1] = -min(this.position[1] - 1, -displacements[1]);
+    else
+      displacements[1] = min(height - this.position[3] - 1, displacements[1]);
+      
     for (int i = 0; i < 4; i++) {
       this.position[i] += displacements[i % 2];
     }
@@ -180,6 +190,38 @@ class Fixture {
     //  this.defaultPoint.x = max(this.position[0], min(this.position[2], this.defaultPoint.x + scaleFactor * displacements[0]));
     //  this.defaultPoint.y += displacements[1];
     //}
+  }
+  
+  void moveTo(Fixture f) {
+    int thisX = (this.position[0] + this.position[2]) / 2;
+    int thisY = (this.position[1] + this.position[3]) / 2;
+    int fX = (f.position[0] + f.position[2]) / 2;
+    int fY = (f.position[1] + f.position[3]) / 2;
+    
+    int xDisp, yDisp;
+    
+    if (abs(thisX - fX) >= abs(thisY - fY)) {
+      // attach to right or left side
+      if (thisX > fX)
+        xDisp = f.position[2] - this.position[0];
+      else
+        xDisp = f.position[0] - this.position[2];
+        
+      yDisp = fY - thisY;
+        
+    }
+    
+    else {
+      // attach to top or bottom
+      if (thisY > fY)
+        yDisp = f.position[3] - this.position[1];
+      else
+        yDisp = f.position[1] - this.position[3];
+        
+      xDisp = fX - thisX;
+    }
+    
+    this.move(new int[]{xDisp, yDisp});
   }
   
   void changeMainSide(String direction) {
