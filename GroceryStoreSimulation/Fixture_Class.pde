@@ -7,7 +7,7 @@ class Fixture {
   Item[] items;
   PVector defaultPoint;
   int index = fixtures.size();
-  color colour;
+  PVector colour;
   int maxStock, stock;
   float urgency, restockChance;  // urgency = 1 - sum of current stock of all items / sum of max stock of all items
   
@@ -21,11 +21,11 @@ class Fixture {
     this.mainSideCoords = new int[0];
     this.type = "Door";
     this.name = "";
-    this.colour = color(0);
+    this.colour = new PVector();
   }
   
   // Default point determined
-  Fixture(int[] p, int[] msc, String t, String n, String[] pr, int ms, float rc, color c, PVector dp) {
+  Fixture(int[] p, int[] msc, String t, String n, String[] pr, int ms, float rc, PVector c, PVector dp) {
     this.position = p;
     this.mainSideCoords = msc;
     this.type = t;
@@ -47,7 +47,7 @@ class Fixture {
   }
   
   // Default point not determined
-  Fixture(int[] p, int[] msc, String t, String n, String[] pr, int ms, float rc, color c) {
+  Fixture(int[] p, int[] msc, String t, String n, String[] pr, int ms, float rc, PVector c) {
     this.position = p;
     this.mainSideCoords = msc;
     this.type = t;
@@ -81,9 +81,15 @@ class Fixture {
     if (this.position.length != 4)
       return;
       
-    stroke(0);
-    strokeWeight(1);
-    fill(this.colour);
+    if (selectedFixture == this.index) {
+      stroke(0, 255, 255);
+      strokeWeight(4);
+    } else {
+      stroke(0);
+      strokeWeight(1);
+    }
+    
+    fill(color(this.colour.x, this.colour.y, this.colour.z));
     
     rect(this.position[0], this.position[1], this.position[2] - this.position[0], this.position[3] - this.position[1]);
     
@@ -103,18 +109,33 @@ class Fixture {
     
     if (currWidth > maxWidth) {
       fontSize *= (maxWidth/currWidth);
-      textSize(fontSize);
+      textSize(max(0.1, fontSize));
     }
     
     else if (textAscent() > twoThirdsY - oneThirdY) {
       fontSize *= ((twoThirdsY - oneThirdY) / textAscent());
-      textSize(fontSize);
+      textSize(max(0.1, fontSize));
     }
     
     
     
     text(this.name, centreX, oneThirdY);
     text(str(this.stock) + "/" + str(this.maxStock), centreX, twoThirdsY);
+    
+    if (selectedFixture == this.index) {
+      stroke(0, 107, 255);
+      line(this.mainSideCoords[0], this.mainSideCoords[1], this.mainSideCoords[2], this.mainSideCoords[3]);
+      
+      strokeWeight(2);
+      
+      stroke(0, 0, 255);
+      fill(0, 197, 255);
+      circle(this.position[0], this.position[1], 12);
+      
+      stroke(255, 0, 0);
+      fill(255, 150, 0);
+      circle(this.defaultPoint.x, this.defaultPoint.y, 8);
+    }
   }
   
   
@@ -124,5 +145,80 @@ class Fixture {
     this.stock = min(this.maxStock, this.stock + restockAmount);
     this.urgency = 1 - this.stock/this.maxStock;
   }
+  
+  void move(int[] displacements) {
+    for (int i = 0; i < 4; i++) {
+      this.position[i] += displacements[i % 2];
+    }
+    
+    for (int i = 0; i < 4; i++) {
+      this.mainSideCoords[i] += displacements[i % 2];
+    }
+    
+    this.defaultPoint.x += displacements[0];
+    this.defaultPoint.y += displacements[1];
+  }
+  
+  void rescale(int[] displacements) {
+    for (int i = 0; i < 4; i++) {
+      if (this.mainSideCoords[i] == this.position[i % 2])
+        this.mainSideCoords[i] += displacements[i % 2];
+    }
+    
+    for (int i = 0; i < 2; i++) {
+      this.position[i] += displacements[i];
+    }
+    
+    this.defaultPoint.x = this.mainSideCoords[2];
+    this.defaultPoint.y = this.mainSideCoords[3];
+    //if (this.mainSideCoords[0] == this.mainSideCoords[2]) {  // vertical main side
+    //  float scaleFactor = (this.position[3] - this.defaultPoint.y) / (this.position[3] - this.position[1]);
+    //  this.defaultPoint.x += displacements[0];
+    //  this.defaultPoint.y = max(this.position[1], min(this.position[3], this.defaultPoint.y + scaleFactor * displacements[1]));
+    //} else {  // horizontal main side
+    //  float scaleFactor = (this.position[2] - this.defaultPoint.x) / (this.position[2] - this.position[0]);
+    //  this.defaultPoint.x = max(this.position[0], min(this.position[2], this.defaultPoint.x + scaleFactor * displacements[0]));
+    //  this.defaultPoint.y += displacements[1];
+    //}
+  }
+  
+  void changeMainSide(String direction) {
+    if (direction.equals("Clockwise")) {
+      int[] tempStorage = {this.mainSideCoords[2], this.mainSideCoords[3]};
+      
+      if (this.mainSideCoords[0] == this.position[0])
+        this.mainSideCoords[2] = this.position[2];
+      else
+        this.mainSideCoords[2] = this.position[0];
+        
+      if (this.mainSideCoords[1] == this.position[1])
+        this.mainSideCoords[3] = this.position[3];
+      else
+        this.mainSideCoords[3] = this.position[1];
+        
+      this.mainSideCoords[0] = tempStorage[0];
+      this.mainSideCoords[1] = tempStorage[1];
+    }
+    
+    else {
+      int[] tempStorage = {this.mainSideCoords[0], this.mainSideCoords[1]};
+      
+      if (this.mainSideCoords[2] == this.position[2])
+        this.mainSideCoords[0] = this.position[0];
+      else
+        this.mainSideCoords[0] = this.position[2];
+        
+      if (this.mainSideCoords[3] == this.position[3])
+        this.mainSideCoords[1] = this.position[1];
+      else
+        this.mainSideCoords[1] = this.position[3];
+        
+      this.mainSideCoords[2] = tempStorage[0];
+      this.mainSideCoords[3] = tempStorage[1];
+    }
+  }
+
+
+  
   
 }

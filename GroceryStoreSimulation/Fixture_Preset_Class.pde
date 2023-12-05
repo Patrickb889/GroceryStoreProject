@@ -3,9 +3,9 @@ class FixturePreset {
   String name;  // (ex: meat, dairy, fruit, pharmacy, etc)
   int maxStock;
   float restockChance;
-  color colour;
+  PVector colour;
   
-  FixturePreset(String t, String n, int ms, float rc, color c) {
+  FixturePreset(String t, String n, int ms, float rc, PVector c) {
     this.type = t;
     this.name = n;
     this.maxStock = ms;
@@ -13,8 +13,9 @@ class FixturePreset {
     this.colour = c;
   }
   
-  FixturePreset(String t, int ms, float rc, color c) {
+  FixturePreset(String t, int ms, float rc, PVector c) {
     this.type = t;
+    this.name = "Default";
     this.maxStock = ms;
     this.restockChance = rc;
     this.colour = c;

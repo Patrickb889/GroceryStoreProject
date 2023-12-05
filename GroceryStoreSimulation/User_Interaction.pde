@@ -12,45 +12,180 @@ String[][] optimalPaths;
 boolean loaded;  // Keeps track of whether a store being saved is a pre-existing one that was modified or a completely new one that was created
 String storeName = "Untitled";
 
-boolean showTextbox = false;
+
+Textbox textbox = new Textbox();
+//boolean showTextbox = false;
 boolean textEntered = false;
 //boolean saveQueued = false;  // Whether or not the user wanted to save before the program needed to do something else like get the store name
-String textboxText = "";
+//String textboxText = "";
 String cursor = "";
-String textboxLabel = "";
+//String textboxLabel = "";
 
-
+int selectedFixture = -1;
+int presetIndex;
 
 void keyPressed() {
-  if (key == 'S' && !showTextbox) {
+  if (key == 'S' && !textbox.show && selectedFixture == -1) {
     saveStore();
   }
+  
+  else if (key == 'c' && !textbox.show)
+    changeFixtureColour("Random");
+  
+  else if (key == 'C' && !textbox.show)
+    changeFixtureColour("Custom");
 
-  //if (key == 's' && !showTextbox) {
-  //  initTextbox();
-  //}
-
-  else if (keyCode == ENTER && showTextbox) {
+  else if (keyCode == ENTER && textbox.show) {
     //textEntered = true;
-    showTextbox = false;
+    textbox.show = false;
 
     if (queuedFunction != null)
       queuedFunction.call();  // Calls whatever function required the user to enter something into a textbox
   }
 
-  else if (keyCode == BACKSPACE && showTextbox && textboxText.length() > 0)
-    textboxText = textboxText.substring(0, textboxText.length() - 1);
+  else if (keyCode == BACKSPACE && textbox.show && textbox.text.length() > 0)
+    textbox.text = textbox.text.substring(0, textbox.text.length() - 1);
 
-  else if (keyCode == 0 && showTextbox) {
+  else if (keyCode == 0 && key != '/' && textbox.show) {
     println(str(key));
-    textboxText += str(key);
+    textbox.text += str(key);
+  }
+  
+  else if (keyCode == LEFT && selectedFixture != -1)
+    fixtures.get(selectedFixture).changeMainSide("Counterclockwise");
+    
+  else if (keyCode == RIGHT && selectedFixture != -1)
+    fixtures.get(selectedFixture).changeMainSide("Clockwise");
+    
+  else if ('0' <= key && key <= '9') {
+    presetIndex = key - 48;
+    
+    addFixture();
+    
+  }
+  
+  else if (key == 'r')
+    renameFixture();
+    
+  else if (key == 'R')
+    reenterProducts();
+    
+  else if (key == 'A')
+    addProducts();
+}
+
+
+String editMode = "";  // "Move", "Resize", "Change default point"
+int clickX, clickY;
+
+void mousePressed() {
+  //if (mouseButton == RIGHT && !textbox.show) {
+  //  for (int i = 0; i < fixturePresets.size(); i++) {
+  //    FixturePreset preset = fixturePresets.get(i);
+  //    println(str(i) + ")", preset.name, preset.type);
+  //  }
+  //}
+  
+  if (!textbox.show) {
+    if (mouseButton == RIGHT) {
+      for (int i = 0; i < fixturePresets.size(); i++) {
+        FixturePreset preset = fixturePresets.get(i);
+        println(str(i) + ")", preset.name, preset.type);
+      }
+    }
+    
+    clickX = mouseX;
+    clickY = mouseY;
+    
+    int tempFixture = -1;
+    
+    for (Fixture f : fixtures) {
+      if (fixtureClicked(f, clickX, clickY)) {
+        //if (mouseButton == RIGHT) {
+        //  requiredPoints = append(requiredPoints, f.index);
+        //  pointsList.add(fixtures.get(f.index).defaultPoint);
+        //  editMode = "Add point";  // Doesn't actually do anything, just lets program know that something major was modified
+        //  if (selectedFixture == -1)
+        //    recalculatePath();
+        //  return;
+        //}
+        
+        if (f.index == selectedFixture) {
+          if (dist(clickX, clickY, f.defaultPoint.x, f.defaultPoint.y) <= 8)
+            editMode = "Change default point";
+          else if (dist(clickX, clickY, f.position[0], f.position[1]) <= 12)
+            editMode = "Resize";
+          else
+            editMode = "Move";
+          
+          return;
+        }
+        
+        else
+          tempFixture = f.index;
+          
+      }
+    }
+    
+    if (tempFixture == -1 && selectedFixture != -1 && !editMode.equals(""))
+      recalculatePath();
+    
+    editMode = "";
+    selectedFixture = tempFixture;
+    
   }
 }
 
-void initTextbox() {
-  showTextbox = true;
-  textboxLabel = "Store Name:";
-  textboxText = "";
+
+void mouseDragged() {
+  if (selectedFixture == -1)
+    return;
+    
+  Fixture f = fixtures.get(selectedFixture);
+  
+  
+  if (editMode.equals("Move")) {
+    f.move(new int[]{mouseX - clickX, mouseY - clickY});
+    
+    clickX = mouseX;
+    clickY = mouseY;
+  }
+  
+  else if (editMode.equals("Resize")) {
+    f.rescale(new int[]{min(mouseX, f.position[2] - 1) - f.position[0], min(mouseY, f.position[3] - 1) - f.position[1]});
+  }
+  
+  else if (editMode.equals("Change default point")) {
+    if (f.mainSideCoords[0] == f.mainSideCoords[2]) {  // vertical main side
+      f.defaultPoint.x = f.mainSideCoords[0];
+      f.defaultPoint.y = max(f.position[1], min(f.position[3], mouseY));
+    }
+    
+    else {  // horizontal main side
+      f.defaultPoint.x = max(f.position[0], min(f.position[2], mouseX));
+      f.defaultPoint.y = f.mainSideCoords[1];
+    }
+  }
+
+}
+
+boolean fixtureClicked(Fixture f, int clickX, int clickY) {
+  if (f.position.length != 4)
+    return false;
+    
+  int x1 = f.position[0];
+  int y1 = f.position[1];
+  int x2 = f.position[2];
+  int y2 = f.position[3];
+  
+  return x1 <= clickX && clickX <= x2 && y1 <= clickY && clickY <= y2 || dist(clickX, clickY, f.position[0], f.position[1]) <= 12 || dist(clickX, clickY, f.defaultPoint.x, f.defaultPoint.y) <= 8;
+}
+
+void initTextbox(String label, String notes) {
+  textbox.show = true;
+  textbox.label = label;
+  textbox.notes = notes;
+  textbox.text = "";
 
   //while (!textEntered) {}
 
@@ -60,10 +195,200 @@ void initTextbox() {
   //return text;
 }
 
+String fixtureName = "";
+void addFixture() {
+  FixturePreset preset = fixturePresets.get(presetIndex);
+  
+  if (preset.name.equals("Default") && fixtureName.equals("")) {
+    if (textbox.text.equals("")) {
+      queuedFunction = new QueuedFunction() {
+        public void call() {
+          addFixture();
+        }
+      };
+      
+      initTextbox("Enter fixture category:", "(e.g. 'Fruits', 'Veg', etc.)");
+      return;
+    }
+    
+    fixtureName = textbox.text;
+
+    textbox.text = "";
+  }
+  
+  
+  if (textbox.text.equals("")) {
+    queuedFunction = new QueuedFunction() {
+      public void call() {
+        addFixture();
+      }
+    };
+    
+    initTextbox("Enter fixture's products:", "(separate with dashes)");
+    return;
+  }
+  
+  String[] prods = split(textbox.text, "-");
+  
+  if (preset.name.equals("Default"))
+    preset.newFixture(new int[]{325, 225, 475, 375}, new int[]{325, 225, 475, 225}, fixtureName, prods);
+  else
+    preset.newFixture(new int[]{325, 225, 475, 375}, new int[]{325, 225, 475, 225}, prods);
+    
+  selectedFixture = fixtures.size() - 1;
+  obstacles.add(fixtures.get(selectedFixture).position);
+  
+  println("New fixture added successfully! Save and restart the program to reiterate through your shopping list.");
+  
+  textbox.text = "";
+  editMode = "Add fixture";  // Doesn't do anything except let program know that major change has happened
+}
+
+void renameFixture() {
+  if (selectedFixture == -1)
+    return;
+    
+  Fixture f = fixtures.get(selectedFixture);
+    
+  if (textbox.text.equals("")) {
+    queuedFunction = new QueuedFunction() {
+      public void call() {
+        renameFixture();
+      }
+    };
+    
+    initTextbox("New Name:", "");
+    return;
+  }
+  
+  f.name = textbox.text;
+  
+  textbox.text = "";
+}
+
+//void deleteFixture() {
+//  if (selectedFixture <= 0)
+//    return;
+    
+//  PVector pointToRemove = fixtures.get(selectedFixture).defaultPoint;
+//  for (int i = 0; i < pointsList.size(); i++) {
+//    if (pointsList.get(i).equals(pointToRemove)) {
+//      pointsList.remove(i);
+//      break;
+//    }
+//  }
+  
+//  for (int i = 0; i < requiredPoints.length; i++) {
+//    if (requiredPoints[i] == selectedFixture) {
+//      println(requiredPoints);
+//      requiredPoints = concat(subset(requiredPoints, 0, selectedFixture), subset(requiredPoints, selectedFixture + 1));
+//      println(requiredPoints);
+//    }
+//  }
+  
+//  println(fixtures.get(selectedFixture).position);
+//  fixtures.remove(selectedFixture);
+//  println(obstacles.get(selectedFixture - 2));
+//  obstacles.remove(selectedFixture - 2);
+//  selectedFixture = 0;
+  
+//  editMode = "Delete fixture";  // Let program know that recalculation is required
+  
+//}
+
+void addProducts() {
+  if (selectedFixture == -1)
+    return;
+    
+  Fixture f = fixtures.get(selectedFixture);
+    
+  if (textbox.text.equals("")) {
+    queuedFunction = new QueuedFunction() {
+      public void call() {
+        addProducts();
+      }
+    };
+    
+    println("Store inventory updated successfully! Save and restart the program to reiterate through your shopping list.");
+    initTextbox("Additional Products:", "(separate with dashes)");
+    return;
+  }
+  
+  String[] newProds = split(textbox.text, "-");
+  
+  f.products = concat(f.products, newProds);
+  println("Store inventory updated successfully! Save and restart the program to reiterate through your shopping list.");
+  
+  textbox.text = "";
+}
+
+void reenterProducts() {
+  if (selectedFixture == -1)
+    return;
+    
+  Fixture f = fixtures.get(selectedFixture);
+    
+  if (textbox.text.equals("")) {
+    queuedFunction = new QueuedFunction() {
+      public void call() {
+        reenterProducts();
+      }
+    };
+    
+    initTextbox("Products:", "(separate with dashes)");
+    return;
+  }
+  
+  String[] newProds = split(textbox.text, "-");
+  printArray(newProds);
+  
+  f.products = newProds;
+  println("Store inventory updated successfully! Restart the program to recheck your shopping list.");
+  
+  textbox.text = "";
+}
+
+void changeFixtureColour(String mode) {
+  if (selectedFixture == -1)
+    return;
+    
+  Fixture f = fixtures.get(selectedFixture);
+    
+  if (mode.equals("Random")) {
+    f.colour.x = round(random(0, 255));
+    f.colour.y = round(random(0, 255));
+    f.colour.z = round(random(0, 255));
+  }
+    
+  else {
+    if (textbox.text.equals("")) {
+      queuedFunction = new QueuedFunction() {
+        public void call() {
+          changeFixtureColour("Custom");
+        }
+      };
+      
+      initTextbox("Enter new RGB:", "(separate values with commas)");
+      return;
+    }
+    
+    int[] rgb = int(splitTokens(textbox.text, ", "));
+    
+    while (rgb.length < 3)
+      rgb = append(rgb, 0);
+      
+    f.colour.x = rgb[0];
+    f.colour.y = rgb[1];
+    f.colour.z = rgb[2];
+    
+    textbox.text = "";
+  }
+}
+
 void saveStore() {
   queuedFunction = null;
   if (!loaded) {
-    if (storeName.equals("Untitled") && textboxText.equals("")) {
+    if (storeName.equals("Untitled") && textbox.text.equals("")) {
       // Store saveStore() function in a general QueuedFunction object
       // When user enters text into a textbox, the program will just call whatever function is stored in object instead of checking booleans for each possible function
       queuedFunction = new QueuedFunction() {
@@ -72,12 +397,12 @@ void saveStore() {
         }
       };
       
-      initTextbox();
+      initTextbox("Store Name:", "");
       return;
     }
 
-    storeName = textboxText;  // should prompt user to enter a name
-    textboxText = "";
+    storeName = textbox.text;  // should prompt user to enter a name
+    textbox.text = "";
 
 
     if (in(storeNames, storeName)) {
@@ -90,7 +415,7 @@ void saveStore() {
         }
       };
       
-      initTextbox();
+      initTextbox("Store Name:", "");
       return;
     }
 
@@ -131,8 +456,8 @@ void saveStore() {
     outputs[8].println(str(fixtures.get(i).maxStock));
     outputs[9].println(str(fixtures.get(i).restockChance));
 
-    color c = fixtures.get(i).colour;
-    outputs[10].println(str(red(c)) + "," + str(green(c)) + "," + str(blue(c)));
+    PVector c = fixtures.get(i).colour;
+    outputs[10].println(str(c.x) + "," + str(c.y) + "," + str(c.z));
 
     PVector p = fixtures.get(i).defaultPoint;
     outputs[11].println(str(p.x) + "," + str(p.y));
@@ -182,7 +507,7 @@ void load(String name) {
     float currRestockChance = float(restockChances[row]);
 
     float[] rgb = float(split(colours[row], ","));
-    color currColour = color(rgb[0], rgb[1], rgb[2]);
+    PVector currColour = new PVector(rgb[0], rgb[1], rgb[2]);
 
     float[] defPointCoords = float(split(defPoints[row], ","));
     PVector currDefaultPoint = new PVector(defPointCoords[0], defPointCoords[1]);
@@ -190,6 +515,11 @@ void load(String name) {
 
     allDistances[row] = currDists;
     optimalPaths[row] = currPaths;
+    
+    for (FixturePreset fp : fixturePresets) {
+      if (fp.type.equals(currType) && fp.name.equals(currName))
+        currColour = fp.colour;  // link the pvectors together
+    }
 
     fixtures.add(new Fixture(currCoords, currMainSides, currType, currName, currProducts, currMaxStock, currRestockChance, currColour, currDefaultPoint));
   }

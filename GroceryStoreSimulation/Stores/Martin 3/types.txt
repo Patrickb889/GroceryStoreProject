@@ -7,3 +7,4 @@ Shelf
 Fridge
 Fridge
 Display
+Fridge

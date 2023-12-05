@@ -4,8 +4,7 @@ int[] potentialObs(PVector currPoint, PVector destination) {
     return new int[]{};
     
   int[] potentialObsX = widthRangeObsCheck[(int) min(currPoint.x, destination.x)][(int) max(min(currPoint.x, destination.x) + 1, max(currPoint.x, destination.x))];
-  int[] potentialObsY = heightRangeObsCheck[(int) min(currPoint.y, destination.y)][(int) max(min(currPoint.y, destination.y) + 1, max(currPoint.y, destination.y))];
-  
+  int[] potentialObsY = heightRangeObsCheck[(int) min(currPoint.y, destination.y)][(int) max(min(currPoint.y, destination.y) + 1, max(currPoint.y, destination.y))]; //<>//
   
     
   //println(potentialObsX);
@@ -31,7 +30,7 @@ boolean obsPresent(PVector destination, PVector currPoint) {  // checks whether 
     //if (destination.x == 450 && destination.y == 450 && currPoint.x == 390 && currPoint.y == 400) //<>//
     //println(intersectionFound(obstacles[i], currPoint, destination));
     //println(pathToCorner(currPoint, destination));
-    if (intersectionFound(obstacles[i], currPoint, destination)) {
+    if (intersectionFound(obstacles.get(i), currPoint, destination)) {
       //println(intersectionFound(obstacles[i], currPoint, destination));
       //println(pathToCorner(currPoint, destination));
       return true;
@@ -57,7 +56,7 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
   
   for (int i : potObs) {
     //println("B");
-    int[] obsCoords = obstacles[i];
+    int[] obsCoords = obstacles.get(i);
     //println(i, "EEEE");
     //println(obsCoords);
     //if (i == 1) {

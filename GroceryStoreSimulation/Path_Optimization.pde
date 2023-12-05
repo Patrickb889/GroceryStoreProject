@@ -1,4 +1,4 @@
-boolean ignoreStock = false;
+boolean ignoreStock = true;
 float busyness = 0.5;
 
 // Uses greedy algorithm (doesn't always find the absolute best path, but is still able to find some pretty good approximations)

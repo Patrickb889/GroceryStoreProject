@@ -17,10 +17,10 @@
 // INITIALIZATION
 ArrayList<PVector> nextSteps = new ArrayList<PVector>();
 //int[][] obstacles = new int[][]{new int[]{675, 100, 700, 500}, new int[]{75, 250, 200, 375}, new int[]{75, 395, 200, 520}, new int[]{0, 100, 25, 300}, new int[]{0, 320, 35, 599}, new int[]{200, 565, 790, 599}, new int[]{150, 170, 280, 180}, new int[]{395, 365, 430, 475}, new int[]{300, 100, 310, 350}, new int[]{320, 100, 330, 350}, new int[]{340, 100, 350, 350}, new int[]{360, 100, 370, 350}, new int[]{380, 100, 390, 350}, new int[]{400, 100, 410, 350}, new int[]{450, 250, 550, 450}, new int[]{290, 390, 390, 500}, new int[]{250, 200, 260, 400}};//new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}, new int[]{round(random(0, 800)), round(random(0, 600)), round(random(0, 800)), round(random(0, 600))}};
-int[][] viableNextSteps = new int[obstacles.length * 4 + 1][];  // viable next steps for each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
-float[][] shortestDistances = new float[obstacles.length * 4 + 1][2];  //index 0 is dist, index 1 is point index of point it came from to get that dist
-float[][] shortestDistancesCopy = new float[obstacles.length * 4 + 1][2];
-float[][][] pathInfo = new float[obstacles.length * 4][obstacles.length * 4 + 1][2];  //index 1 is last point index, index 0 is dist so far
+int[][] viableNextSteps = new int[obstacles.size() * 4 + 1][];  // viable next steps for each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
+float[][] shortestDistances = new float[obstacles.size() * 4 + 1][2];  //index 0 is dist, index 1 is point index of point it came from to get that dist
+float[][] shortestDistancesCopy = new float[obstacles.size() * 4 + 1][2];
+float[][][] pathInfo = new float[obstacles.size() * 4][obstacles.size() * 4 + 1][2];  //index 1 is last point index, index 0 is dist so far
 //int[][] obstX, obstY; 
 //int minWidth = -1;
 //int minHeight = -1;
@@ -28,12 +28,12 @@ float[][][] pathInfo = new float[obstacles.length * 4][obstacles.length * 4 + 1]
 int[][][] widthRangeObsCheck;
 int[][][] heightRangeObsCheck;
 
-int obsLen = obstacles.length;
+int obsLen = obstacles.size();
 
 ArrayList<int[]> currPoints = new ArrayList<int[]>();  //dynamic arraylist because length will change constantly
 ArrayList<int[]> nextPoints = new ArrayList<int[]>();
 
-int[] nextPointsCounter = new int[obstacles.length * 4 + 1];
+int[] nextPointsCounter = new int[obstacles.size() * 4 + 1];
 
 float minDist = -1;
 int minIndex = -1;
@@ -42,16 +42,16 @@ int minIndex = -1;
 String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   // reinitialize all variables and lists
   nextSteps = new ArrayList<PVector>();
-  viableNextSteps = new int[obstacles.length * 4 + 1][];  // viable next steps for each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
-  shortestDistances = new float[obstacles.length * 4 + 1][2];  //index 0 is dist, index 1 is point index of point it came from to get that dist
-  pathInfo = new float[obstacles.length * 4][obstacles.length * 4 + 1][2];  //index 1 is last point index, index 0 is dist so far
+  viableNextSteps = new int[obstacles.size() * 4 + 1][];  // viable next steps for each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
+  shortestDistances = new float[obstacles.size() * 4 + 1][2];  //index 0 is dist, index 1 is point index of point it came from to get that dist
+  pathInfo = new float[obstacles.size() * 4][obstacles.size() * 4 + 1][2];  //index 1 is last point index, index 0 is dist so far
   //todo: may not need pathInfo
-  obsLen = obstacles.length;
+  obsLen = obstacles.size();
   
   currPoints = new ArrayList<int[]>();
   nextPoints = new ArrayList<int[]>();
   
-  nextPointsCounter = new int[obstacles.length * 4 + 1];
+  nextPointsCounter = new int[obstacles.size() * 4 + 1];
   
   minDist = -1;
   minIndex = -1;
@@ -70,8 +70,8 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   heightRangeObsCheck = new int[height][height][0];  // same but for y
   
   // Iterate through all obstacles
-  for (int i = 0; i < obstacles.length; i++) {
-    int[] ob = obstacles[i];
+  for (int i = 0; i < obstacles.size(); i++) {
+    int[] ob = obstacles.get(i);
     // Ranges that should be updated include ranges with lowest value less than obstacle's rightmost x and highest value more than obstacle's leftmost x
     for (int lower = 0; lower < ob[2]; lower++) {
       for (int higher = max(lower + 1, ob[0] + 1); higher < width; higher++)
@@ -381,7 +381,7 @@ PVector[] relevantCornerCoords(PVector startPoint, int[] obsCoords) {
 //figure out no intersections not being counted
 // Checks if an obstacle is intersected by a path (checks for intersection between line segments involved)
 boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoords) {
-    int x1 = (int) startCoords.x;
+    int x1 = (int) startCoords.x; //<>//
     int y1 = (int) startCoords.y;
     int x2 = (int) endCoords.x;
     int y2 = (int) endCoords.y;
@@ -406,11 +406,17 @@ boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoord
       }
       
       else {  //known coordinate is y
-        
-        otherCoord = round((coord-b)/m);
-        
-        if (min(obsCoords[0], obsCoords[2]) < otherCoord && otherCoord < max(obsCoords[0], obsCoords[2]) && min(y1, y2) < coord && coord < max(y1, y2))
-          return true;
+        if (x1 == x2) {
+          if (min(y1, y2) < coord && coord < max(y1, y2) && obsCoords[0] < x1 && x1 < obsCoords[1])
+            return true;
+        }
+          
+        else {
+          otherCoord = round((coord-b)/m);
+          
+          if (min(obsCoords[0], obsCoords[2]) < otherCoord && otherCoord < max(obsCoords[0], obsCoords[2]) && min(y1, y2) < coord && coord < max(y1, y2))
+            return true;
+        }
         
       }
         
@@ -442,7 +448,7 @@ boolean pathToCorner(PVector cornerCoords, PVector initialCoords, int obIndex) {
     
   int newX = (int) cornerCoords.x + xStep;
   int newY = (int) cornerCoords.y + yStep;
-  int[] ob = obstacles[obIndex];
+  int[] ob = obstacles.get(obIndex);
   //println(ob);
   //println(newX, newY, "DDDDDDDDDDDDDDDDDDDDDDD");
   return ob[0] < newX && newX < ob[2] && ob[1] < newY && newY < ob[3];
