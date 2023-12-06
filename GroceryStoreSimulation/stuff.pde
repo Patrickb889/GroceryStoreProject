@@ -4,7 +4,9 @@ int[] potentialObs(PVector currPoint, PVector destination) {
     return new int[]{};
     
   int[] potentialObsX = widthRangeObsCheck[(int) min(currPoint.x, destination.x)][(int) max(min(currPoint.x, destination.x) + 1, max(currPoint.x, destination.x))];
-  int[] potentialObsY = heightRangeObsCheck[(int) min(currPoint.y, destination.y)][(int) max(min(currPoint.y, destination.y) + 1, max(currPoint.y, destination.y))]; //<>//
+  println(currPoint);
+  println(destination);
+  int[] potentialObsY = heightRangeObsCheck[(int) min(currPoint.y, destination.y)][(int) max(min(currPoint.y, destination.y) + 1, max(currPoint.y, destination.y))];
   
     
   //println(potentialObsX);
@@ -110,6 +112,15 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
             shortestDistances[cornerIndex][0] = dist;
             shortestDistances[cornerIndex][1] = pointIndex;
           }
+        }
+        
+        else {
+          //todo: add intermeiate point
+          //todo: potential better algorithm, just take two coords furthest to both sides (relative to the line segment)
+          // just check all obs and the relevant corners, create func to find dist to side relative to line (just perp distance to line, use the formula or something)
+          // change valid next to only check intersection with other intersected obstacles (modify pot obs function to be able to take specific ones to include in search)
+          // keep track of maxes for both sides, eventually just add maxes to nextPoints
+          // if start to a corner intersects obstacle which is not one of the original obstacles, new point is first obstacle, corner closest to line segment (perp distance)
         }
       }
     }

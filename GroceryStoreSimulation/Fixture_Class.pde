@@ -120,7 +120,7 @@ class Fixture {
     
     
     text(this.name, centreX, oneThirdY);
-    text(str(this.stock) + "/" + str(this.maxStock), centreX, twoThirdsY);
+    text(this.index, centreX, twoThirdsY);//str(this.stock) + "/" + str(this.maxStock)
     
     if (selectedFixture == this.index) {
       stroke(0, 107, 255);
@@ -147,6 +147,9 @@ class Fixture {
   }
   
   void move(int[] displacements) {
+    if (displacements[0] != 0 || displacements[1] != 0)
+      recalcRequired = true;
+    
     if (displacements[0] < 0)
       displacements[0] = -min(this.position[0] - 1, -displacements[0]);
     else
@@ -170,6 +173,9 @@ class Fixture {
   }
   
   void rescale(int[] displacements) {
+    if (displacements[0] != 0 || displacements[1] != 0)
+      recalcRequired = true;
+      
     for (int i = 0; i < 4; i++) {
       if (this.mainSideCoords[i] == this.position[i % 2])
         this.mainSideCoords[i] += displacements[i % 2];

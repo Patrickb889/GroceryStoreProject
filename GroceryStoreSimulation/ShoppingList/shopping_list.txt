@@ -1,4 +1,5 @@
 Carrots
+cleaning supplies
 Bananas
 Milk
 Orangs
@@ -11,6 +12,24 @@ Cake
 Goranges
 Eggs
 Medicine
-a
+ice cream
+advil
+bandages
+flossers
+perfume
+shampoo
+boutique
+pizza
+post office
+toys
+batteries
+chips
+coffee
+probiotics
+multivitamins
+ketchup
+cereal
+noodles
+toilet paper
 Broccoli
 deez nuts

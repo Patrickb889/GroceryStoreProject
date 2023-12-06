@@ -14,22 +14,69 @@ void search(int pathLength) {
   
   for (int pointIndex = pathLength; pointIndex < requiredPoints.length; pointIndex++) {
     float priority = pointPriority(currPointIndex, requiredPoints[pointIndex]);
-    
     if (priority > maxPriority) {
       maxPriority = priority;
       maxIndex = pointIndex;
     }
   }
-  
+  if (maxIndex == -1) {
+    recalculatePath();
+    return;
+  }
   swap(requiredPoints, pathLength, maxIndex);  // Move point with max priority to first section (saved section) of array
+  
+  if (pathAccuracy.equals("Approx")) {
+    if (pathLength == 0)
+      updatePathInfo(0, requiredPoints[0]);
+      
+    if (pathLength > 0 || requiredPoints.length <= 2) {
+      int i = requiredPoints[pathLength - 1 + int(pathLength == 0)];
+      int j = requiredPoints[pathLength + int(pathLength == 0)];
+      
+      updatePathInfo(min(i, j), max(i, j));
+      
+      if (pathLength == requiredPoints.length - 2) {
+        int lastPointIndex = requiredPoints[requiredPoints.length - 1];
+        updatePathInfo(j, lastPointIndex);
+        updatePathInfo(1, lastPointIndex);
+        
+      }
+        
+    }
+    
+  }
+}
+
+
+void updatePathInfo(int i, int j) {  //i < j
+  if (optimalPaths[i][j] != null)
+    return;
+    
+  PVector p1 = fixtures.get(i).defaultPoint;
+  PVector p2 = fixtures.get(j).defaultPoint;
+  
+  String[] pathInfo = pathFind(p1, p2, i, j);
+  
+  allDistances[i][j] = float(pathInfo[0]);
+  optimalPaths[i][j] = pathInfo[1];
 }
 
 // Calculates priority of a point (point with highest priority will be the next point in the path)
 float pointPriority(int currPointIndex, int nextPointIndex) {
-  float distToPoint = allDistances[min(currPointIndex, nextPointIndex)][max(currPointIndex, nextPointIndex)];// = dist(currPoint.x, currPoint.y, nextPoint.x, nextPoint.y);  // Distance from current point to next point
-  float distToDest = allDistances[1][nextPointIndex];// = dist(nextPoint.x, nextPoint.y, exit.x, exit.y);  // Distance from the next point being checked to the ultimate destination (checkout/store exit)
+  //todo: add recalc shopping list func, fix this, if doesn't work, just get rid of deleteing func and hotkey
+  float distToPoint, distToDest;
   
-  //todo: after stock and urgency implemented (implement shopper pathfinding first), this will be fixture.get(nextPointIndex).urgency*distToDest/distToPoint
+  if (pathAccuracy.equals("Accurate")) {
+    distToPoint = allDistances[min(currPointIndex, nextPointIndex)][max(currPointIndex, nextPointIndex)];// = dist(currPoint.x, currPoint.y, nextPoint.x, nextPoint.y);  // Distance from current point to next point
+    distToDest = allDistances[1][nextPointIndex];// = dist(nextPoint.x, nextPoint.y, exit.x, exit.y);  // Distance from the next point being checked to the ultimate destination (checkout/store exit)
+  } else {
+    PVector currPoint = fixtures.get(currPointIndex).defaultPoint;
+    PVector nextPoint = fixtures.get(nextPointIndex).defaultPoint;
+    
+    distToPoint = dist(currPoint.x, currPoint.y, nextPoint.x, nextPoint.y);
+    distToDest = dist(nextPoint.x, nextPoint.y, exit.x, exit.y);
+  }
+  //todo: after stock and urgency implemented (implement shopper pathfinding first), this will be fixture.get(nextPointIndex).urgency*distToDest/distToPoint(done)
   float priority = distToDest/distToPoint;
   
   if (!ignoreStock) {

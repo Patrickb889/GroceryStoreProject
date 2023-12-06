@@ -68,6 +68,7 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   // 2d array containing information about which obstacles can be found in each pixel range for both x and y
   widthRangeObsCheck = new int[width][width][0];  // index i is the lowest number of the range, index j is the highest, array at [i][j] would contain all indices of obstacles with x values in that range
   heightRangeObsCheck = new int[height][height][0];  // same but for y
+ //<>//
   
   // Iterate through all obstacles
   for (int i = 0; i < obstacles.size(); i++) {
@@ -97,9 +98,9 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   // proceed as normal (same, just less corners, therefore less branches)
   //if no time, just take order as provided in shopping list
   //todo: clean up stinky code
-  
+  //todo: if path to a corner point is blocked, closestcorner oof all obstacles becomes new point
   // each step would involve each path moving forward by one line segment (max path length would go through each obstacle corner once)
-  for (int step = -1; step < pathInfo.length - 1; step++) {
+  for (int step = -1; step < pathInfo.length - 1; step++) { //<>// //<>//
     // Loop through indices of current last points of each path
     for (int[] index : currPoints) {
       int i = index[0];
@@ -177,7 +178,7 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
     // Next points become current points
     for (int i = 0; i < nextPoints.size(); i++) {
       currPoints.add(nextPoints.get(i));
-    } //<>// //<>//
+    } //<>// //<>// //<>//
   }
   
   // At this point, the optimal path has already been determined
@@ -381,7 +382,7 @@ PVector[] relevantCornerCoords(PVector startPoint, int[] obsCoords) {
 //figure out no intersections not being counted
 // Checks if an obstacle is intersected by a path (checks for intersection between line segments involved)
 boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoords) {
-    int x1 = (int) startCoords.x; //<>//
+    int x1 = (int) startCoords.x;
     int y1 = (int) startCoords.y;
     int x2 = (int) endCoords.x;
     int y2 = (int) endCoords.y;

@@ -8,8 +8,10 @@ class QueuedFunction {
 
 QueuedFunction queuedFunction = null;
 
-PVector entrance = new PVector(0, 0);
-PVector exit = new PVector(100, 0);
+String pathAccuracy = "Approx";  //"Approx" or "Accurate"
+
+PVector entrance = new PVector(150, 590);
+PVector exit = new PVector(300, 590);
 float userSpeed = 1;
 ArrayList<String> importedList = new ArrayList<String>();
 
@@ -37,7 +39,7 @@ void setup() {
   }
   
   //pointsList = new PVector[shoppingList.length + 2];
-  listPointFixtureIndices = new int[shoppingList.length + 2];
+  //listPointFixtureIndices = new int[shoppingList.length + 2];
   
   fill(0);
   textSize(30);
@@ -64,6 +66,15 @@ void setup() {
   //int[] p, int[] msc, String t, String n, String[] ctgs, color c
   //fixtures.add(new Fixture(entrance));
   //fixtures.add(new Fixture(exit));
+  //1,484,522,540
+  //328,196,478,346
+  //3,155,61,413
+  //fixturePresets.get(2).newFixture(new int[]{3,155,61,413}, new int[]{61,155,61,413}, new String[]{"Carrots"});
+  //fixturePresets.get(0).newFixture(new int[]{328,196,478,346}, new int[]{328,346,478,346}, new String[]{"Oranges"});
+  //fixturePresets.get(5).newFixture(new int[]{1,484,522,540}, new int[]{1,540,522,540}, new String[]{"cake"});
+  //fixtures.get(2).defaultPoint = new PVector(61, 300);
+  //fixtures.get(3).defaultPoint = new PVector(440, 346);
+  //fixtures.get(4).defaultPoint = new PVector(270, 540);
   //fixturePresets.get(6).newFixture(new int[]{675, 100, 725, 500}, new int[]{675, 100, 675, 500}, "Pharmacy", new String[]{"Medicine"});
   //fixturePresets.get(0).newFixture(new int[]{75, 250, 200, 375}, new int[]{75, 250, 200, 250}, new String[]{"Oranges", "Apples", "Bananas", "Canteloupes"});
   //fixturePresets.get(1).newFixture(new int[]{75, 395, 200, 520}, new int[]{75, 395, 200, 395}, new String[]{"Cabbage", "Lettuce", "Broccoli", "Caufliflower"});
@@ -71,46 +82,49 @@ void setup() {
   //fixturePresets.get(3).newFixture(new int[]{0, 320, 35, 599}, new int[]{35, 320, 35, 599}, new String[]{"Milk", "Yogurt", "Cheese", "Butter", "Ice cream"});
   //fixturePresets.get(4).newFixture(new int[]{200, 565, 790, 599}, new int[]{200, 565, 790, 565}, new String[]{"Ground beef", "Steak", "Chicken wings", "Porkchops", "Kebabs", "Eggs"});
   //fixturePresets.get(5).newFixture(new int[]{290, 390, 390, 500}, new int[]{290, 390, 390, 390}, new String[]{"Cookies", "Muffins", "Cupcakes", "Bread", "Brownies", "Pie", "Cake"});
-  load("Test 1");  //demo saved store
+  load("Shoppers");  //demo saved store
   //obstacles = new int[fixtures.size()-2][4];
   //for (Fixture f : fixtures)
   //  println(f.stock, f.maxStock, f.urgency, f.type);
-  for (int i = 0; i < fixtures.size() - 2; i++) {
-    obstacles.add(fixtures.get(i+2).position);
+  for (int i = 2; i < fixtures.size(); i++) {
+    obstacles.add(fixtures.get(i).position);
   }
   
-  pointsList.add(entrance);
-  pointsList.add(exit);
-  listPointFixtureIndices[0] = 0;
-  listPointFixtureIndices[listPointFixtureIndices.length-1] = 1;
-  for (int i = 0; i < shoppingList.length; i++) {
-    PVector pos = findPosition(shoppingList[i]);
+  checkShoppingList("Initial");
+  //pointsList.add(entrance);
+  //pointsList.add(exit);
+  //listPointFixtureIndices[0] = 0;
+  //listPointFixtureIndices[listPointFixtureIndices.length-1] = 1;
+  //for (int i = 0; i < shoppingList.length; i++) {
+  //  PVector pos = findPosition(shoppingList[i]);
     
-    if (pos.x != -1) {
-      pointsList.add(pos);
-      listPointFixtureIndices[i+1] = int(pos.z);
-    }
+  //  if (pos.x != -1) {
+  //    pointsList.add(pos);
+  //    listPointFixtureIndices[i+1] = int(pos.z);
+  //  }
     
-    else {  // if pos.x is -1, then the function was unable to find the item in any of the fixtures
-      println("Sorry,", "'" + shoppingList[i] + "'", "is not a product in this store. Perhaps you made a typo in your shopping list?");
-      //pointsList[i+1] = pointsList[i];
-      listPointFixtureIndices[i+1] = listPointFixtureIndices[i];
-    }
+  //  else {  // if pos.x is -1, then the function was unable to find the item in any of the fixtures
+  //    println("Sorry,", "'" + shoppingList[i] + "'", "is not a product in this store. Perhaps you made a typo in your shopping list?");
+  //    //pointsList[i+1] = pointsList[i];
+  //    listPointFixtureIndices[i+1] = listPointFixtureIndices[i];
+  //  }
       
-  }
+  //}
   
-  fixtureCounter = new boolean[fixtures.size()];
-  requiredPoints = new int[0];
-  for (int i = 1; i < listPointFixtureIndices.length - 1; i++) {
-    int fixtureIndex = listPointFixtureIndices[i];
+  //fixtureCounter = new boolean[fixtures.size()];
+  //requiredPoints = new int[0];
+  //for (int i = 1; i < listPointFixtureIndices.length - 1; i++) {
+  //  int fixtureIndex = listPointFixtureIndices[i];
     
-    if (!fixtureCounter[fixtureIndex] && fixtureIndex > 1) {
-      fixtureCounter[fixtureIndex] = true;
-      requiredPoints = append(requiredPoints, fixtureIndex);
-    }
-  }
+  //  if (!fixtureCounter[fixtureIndex] && fixtureIndex > 1) {
+  //    fixtureCounter[fixtureIndex] = true;
+  //    requiredPoints = append(requiredPoints, fixtureIndex);
+  //  }
+  //}
   
   if (loaded) {
+    recalcRequired = false;
+    
     for (int pathLength = 0; pathLength < requiredPoints.length - 1; pathLength++) {  // only pointsList.size() - 1 iterations because between the last two points not counting the exit, if one is chosen, the other has to be last (no need to check what is already known)
       search(pathLength);
     }
@@ -118,9 +132,19 @@ void setup() {
     fullPath = concat(new int[]{0}, append(requiredPoints, 1));
   }
   
+  else {
+    int numFixtures = fixtures.size();
+    
+    allDistances = new float[numFixtures][numFixtures];
+    optimalPaths = new String[numFixtures][numFixtures];
+    
+    //allDistances[0][1] = dist(entrance.x, entrance.y, exit.x, exit.y);
+    //optimalPaths[0][1] = "1-0";
+  }
+  
 }
 
-boolean pathCalculated = false;
+boolean pathCalculated = pathAccuracy.equals("Approx");
 boolean pathFound = false;
 
 boolean[] fixtureCounter;  // keeps track of all the fixtures that need to be visited in the path
@@ -156,7 +180,7 @@ void draw() {
   strokeWeight(1);
   for (Fixture f : fixtures)
     f.drawMe();
-    
+  //println(pathCalculated);
   if (pathCalculated && selectedFixture == -1) {
     if (!pathFound) {
       for (int pathLength = 0; pathLength < requiredPoints.length - 1; pathLength++) {  // only pointsList.size() - 1 iterations because between the last two points not counting the exit, if one is chosen, the other has to be last (no need to check what is already known)
@@ -164,6 +188,14 @@ void draw() {
       }
       
       fullPath = concat(new int[]{0}, append(requiredPoints, 1));
+      
+      if (requiredPoints.length == 0)
+        updatePathInfo(0, 1);
+        
+      else if (requiredPoints.length == 1) {
+        updatePathInfo(0, requiredPoints[0]);
+        updatePathInfo(1, requiredPoints[0]);
+      }
     }
   
     stroke(0, 150, 255);
@@ -171,7 +203,8 @@ void draw() {
 
     for (int pointIndex = 1; pointIndex < fullPath.length; pointIndex++) {
       int ind1 = fullPath[pointIndex-1];
-      int ind2 = fullPath[pointIndex]; //<>//
+      int ind2 = fullPath[pointIndex];
+      //println(ind1, ind2);
       String stringPath = optimalPaths[min(ind1, ind2)][max(ind1, ind2)];
       int[] path = int(split(stringPath, "-"));
       
@@ -200,7 +233,7 @@ void draw() {
     strokeWeight(1);
     for (PVector point : pointsList)
       circle(point.x, point.y, 8);
-  } //<>//
+  } //<>// //<>//
 
 
 
@@ -236,8 +269,9 @@ void draw() {
   //}
   
   
-  
-  if (!pathCalculated) {
+  //println(pathCalculated, pathAccuracy.equals("Accurate"));
+  if (!pathCalculated && pathAccuracy.equals("Accurate")) {
+    //println("AA");
     //todo: fixture class implement(done)
     //todo: file stuff (need to store objects and distances as well as paths)(done)
     //todo: figure out way to store distances and paths(done)
@@ -271,10 +305,10 @@ void draw() {
     optimalPaths = new String[numFixtures][numFixtures];
 
     for (int i = 0; i < numFixtures; i++) {
-      for (int j = i+1; j < numFixtures; j++) {
+      for (int j = i+1; j < numFixtures; j++) { //<>//
         PVector p1 = fixtures.get(i).defaultPoint;
         PVector p2 = fixtures.get(j).defaultPoint;
-          
+        
         String[] pathInfo = pathFind(p1, p2, i, j);
         
         allDistances[i][j] = float(pathInfo[0]);

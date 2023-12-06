@@ -1,4 +1,4 @@
-// File data arrays //<>// //<>// //<>// //<>//
+// File data arrays //<>// //<>// //<>// //<>// //<>//
 float[][] allDistances;
 String[][] optimalPaths;
 //int[][] fixtureCoords;
@@ -47,11 +47,15 @@ void keyPressed() {
       queuedFunction.call();  // Calls whatever function required the user to enter something into a textbox
   }
 
-  else if (keyCode == BACKSPACE && textbox.show && textbox.text.length() > 0)
-    textbox.text = textbox.text.substring(0, textbox.text.length() - 1);
+  else if (keyCode == BACKSPACE) {
+    if (textbox.show && textbox.text.length() > 0)
+      textbox.text = textbox.text.substring(0, textbox.text.length() - 1);
+    else if (!textbox.show)
+      deleteLastFixture();
+  }
 
   else if (keyCode == 0 && key != '/' && textbox.show) {
-    println(str(key));
+    //println(str(key));
     textbox.text += str(key);
   }
   
@@ -68,8 +72,12 @@ void keyPressed() {
     
   }
   
-  else if (key == 'r')
-    renameFixture();
+  else if (key == 'r') {
+    if (altHeld)
+      recalculatePath();  // alt + r to manually recalculate path
+    else
+      renameFixture();
+  }
     
   else if (key == 'R')
     reenterProducts();
@@ -77,13 +85,31 @@ void keyPressed() {
   else if (key == 'A')
     addProducts();
     
-  else if (keyCode == ALT)
+  else if (keyCode == ALT) {
     altHeld = true;
+    defaultMoveDistance = 1;
+  }
+    
+  else if (key == 'w' && selectedFixture > 0)
+    fixtures.get(selectedFixture).move(new int[]{0, -defaultMoveDistance});
+    
+  else if (key == 's' && selectedFixture > 0)
+    fixtures.get(selectedFixture).move(new int[]{0, defaultMoveDistance});
+    
+  else if (key == 'a' && selectedFixture > 0)
+    fixtures.get(selectedFixture).move(new int[]{-defaultMoveDistance, 0});
+    
+  else if (key == 'd' && selectedFixture > 0)
+    fixtures.get(selectedFixture).move(new int[]{defaultMoveDistance, 0});
 }
 
+int defaultMoveDistance = 10;
+
 void keyReleased() {
-  if (keyCode == ALT)
+  if (keyCode == ALT) {
     altHeld = false;
+    defaultMoveDistance = 10;
+  }
 }
 
 String editMode = "";  // "Move", "Resize", "Change default point"
@@ -119,7 +145,7 @@ void mousePressed() {
           //if (selectedFixture == -1)
           //  recalculatePath();
           
-          if (f.index != selectedFixture) {
+          if (f.index != selectedFixture && selectedFixture != -1) {
             Fixture thisF = fixtures.get(selectedFixture);
             
             thisF.colour = f.colour;
@@ -142,15 +168,12 @@ void mousePressed() {
               editMode = "Resize";
             else
               editMode = "Move";
-              
-            recalcRequired = true;
             
             return;
           }
           
-          else if (altHeld) {
+          else if (altHeld && selectedFixture != -1) {
             fixtures.get(selectedFixture).moveTo(f);
-            recalcRequired = true;
             
             return;
           }
@@ -163,7 +186,6 @@ void mousePressed() {
     }
     //println(editMode);
     if (recalcRequired && tempFixture == -1) {
-      recalcRequired = false;
       recalculatePath();
     }
     
@@ -193,6 +215,8 @@ void mouseDragged() {
   }
   
   else if (editMode.equals("Change default point")) {
+    recalcRequired = true;
+      
     if (f.mainSideCoords[0] == f.mainSideCoords[2]) {  // vertical main side
       f.defaultPoint.x = f.mainSideCoords[0];
       f.defaultPoint.y = max(f.position[1], min(f.position[3], mouseY));
@@ -275,9 +299,11 @@ void addFixture() {
   selectedFixture = fixtures.size() - 1;
   obstacles.add(fixtures.get(selectedFixture).position);
   
-  println("New fixture added successfully! Save and restart the program to reiterate through your shopping list.");
+  //println("New fixture added successfully! Save and restart the program to reiterate through your shopping list.");
+  checkShoppingList();
   
   textbox.text = "";
+  fixtureName = "";
   recalcRequired = true;;  // Doesn't do anything except let program know that major change has happened
 }
 
@@ -303,35 +329,36 @@ void renameFixture() {
   textbox.text = "";
 }
 
-//void deleteFixture() {
-//  if (selectedFixture <= 0)
-//    return;
+void deleteLastFixture() {
+  //if (fixtures.size() == 2)
+  //  return;
     
-//  PVector pointToRemove = fixtures.get(selectedFixture).defaultPoint;
-//  for (int i = 0; i < pointsList.size(); i++) {
-//    if (pointsList.get(i).equals(pointToRemove)) {
-//      pointsList.remove(i);
-//      break;
-//    }
-//  }
+  //PVector pointToRemove = fixtures.get(selectedFixture).defaultPoint;
+  //for (int i = 0; i < pointsList.size(); i++) {
+  //  if (pointsList.get(i).equals(pointToRemove)) {
+  //    pointsList.remove(i);
+  //    break;
+  //  }
+  //}
   
-//  for (int i = 0; i < requiredPoints.length; i++) {
-//    if (requiredPoints[i] == selectedFixture) {
-//      println(requiredPoints);
-//      requiredPoints = concat(subset(requiredPoints, 0, selectedFixture), subset(requiredPoints, selectedFixture + 1));
-//      println(requiredPoints);
-//    }
-//  }
+  //for (int i = 0; i < requiredPoints.length; i++) {
+  //  if (requiredPoints[i] == selectedFixture) {
+  //    println(requiredPoints);
+  //    requiredPoints = concat(subset(requiredPoints, 0, selectedFixture), subset(requiredPoints, selectedFixture + 1));
+  //    println(requiredPoints);
+  //  }
+  //}
   
-//  println(fixtures.get(selectedFixture).position);
-//  fixtures.remove(selectedFixture);
-//  println(obstacles.get(selectedFixture - 2));
-//  obstacles.remove(selectedFixture - 2);
-//  selectedFixture = 0;
+  ////println(fixtures.get(selectedFixture).position);
+  //fixtures.remove(fixtures.size() - 1);
+  ////println(obstacles.get(selectedFixture - 2));
+  //obstacles.remove(obstacles.size() - 1);
+  //selectedFixture = -1;
   
-//  editMode = "Delete fixture";  // Let program know that recalculation is required
-  
-//}
+  //recalcRequired = true;  // Let program know that recalculation is required
+  ////todo: call recheck shopping list, no need to go through and delete requiredPoints / pointsList elements
+  //checkShoppingList();
+}
 
 void addProducts() {
   if (selectedFixture == -1)
@@ -346,7 +373,6 @@ void addProducts() {
       }
     };
     
-    println("Store inventory updated successfully! Save and restart the program to reiterate through your shopping list.");
     initTextbox("Additional Products:", "(separate with dashes)");
     return;
   }
@@ -354,7 +380,8 @@ void addProducts() {
   String[] newProds = split(textbox.text, "-");
   
   f.products = concat(f.products, newProds);
-  println("Store inventory updated successfully! Save and restart the program to reiterate through your shopping list.");
+  //println("Store inventory updated successfully! Save and restart the program to reiterate through your shopping list.");
+  checkShoppingList();
   
   textbox.text = "";
 }
@@ -380,7 +407,8 @@ void reenterProducts() {
   printArray(newProds);
   
   f.products = newProds;
-  println("Store inventory updated successfully! Restart the program to recheck your shopping list.");
+  //println("Store inventory updated successfully! Restart the program to recheck your shopping list.");
+  checkShoppingList();
   
   textbox.text = "";
 }
@@ -392,9 +420,14 @@ void changeFixtureColour(String mode) {
   Fixture f = fixtures.get(selectedFixture);
     
   if (mode.equals("Random")) {
-    f.colour.x = round(random(0, 255));
-    f.colour.y = round(random(0, 255));
-    f.colour.z = round(random(0, 255));
+    if (f.type.equals("Custom"))
+      f.colour = new PVector(round(random(0, 255)), round(random(0, 255)), round(random(0, 255)));
+      
+    else {
+      f.colour.x = round(random(0, 255));
+      f.colour.y = round(random(0, 255));
+      f.colour.z = round(random(0, 255));
+    }
   }
     
   else {
@@ -414,9 +447,15 @@ void changeFixtureColour(String mode) {
     while (rgb.length < 3)
       rgb = append(rgb, 0);
       
-    f.colour.x = rgb[0];
-    f.colour.y = rgb[1];
-    f.colour.z = rgb[2];
+      
+    if (f.type.equals("Custom"))
+      f.colour = new PVector(rgb[0], rgb[1], rgb[2]);
+      
+    else {
+      f.colour.x = rgb[0];
+      f.colour.y = rgb[1];
+      f.colour.z = rgb[2];
+    }
     
     textbox.text = "";
   }
@@ -443,7 +482,7 @@ void saveStore() {
 
 
     if (in(storeNames, storeName)) {
-      println(storeName);
+      //println(storeName);
       println("Store already exists! Please choose a different name.");
       
       queuedFunction = new QueuedFunction() {

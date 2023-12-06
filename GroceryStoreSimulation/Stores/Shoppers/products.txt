@@ -1,0 +1,34 @@
+
+
+bananas,oranges,apples,lemons,limes,avocados,carrots
+muffins,cake,pies,cookies,brownies
+batteries,cables,headphones,game consoles,keyboards
+juice,iced tea,iced coffee
+milk,butter,eggs,cheese,yogurt
+pizza,microwave dinners
+ice cream
+post office
+pharmacy,medicine
+chocolate,candy
+noodles,tortillas,bread
+ketchup,mustard,bbq sauce,salt,pepper,seasoning
+coffee,tea,hot chocolate
+beans,soup,sardines,evaporated milk
+soda,pop
+chips
+toilet paper,detergent,tissues
+chips,dip
+cleaning supplies
+cough drops,advil,tylenol,laxatives
+benadryl,polysporin,oragel,bandages,hydrogen peroxide,alcohol
+diapers,wrapping paper,cards
+toothbrushes,flossers,toothpaste,mouthwash
+shampoo,body wash,perfume,cologne,conditioner
+make up
+boutique,make up
+make up
+multivitamins,minerals,herbal remedies
+nutrient bars,fish oil,probiotics
+supplements,protein powder,creatine
+mugs,toys,games,decorations
+electronics,video games,guitars

@@ -30,19 +30,74 @@ String pathToString(ArrayList<int[]> path) {
 
 
 void recalculatePath() {
-  pathCalculated = false;
+  recalcRequired = false;
+  pathCalculated = pathAccuracy.equals("Approx");
   pathFound = false;
+  
+  int numFixtures = fixtures.size();
+  allDistances = new float[numFixtures][numFixtures];
+  optimalPaths = new String[numFixtures][numFixtures];
   
   textAlign(CENTER, CENTER);
   textSize(50);
   fill(0);
-  text("Recalculating...", width/2-3, height/2+3);
-  text("Recalculating...", width/2+1, height/2+1);
-  text("Recalculating...", width/2-1, height/2-1);
-  text("Recalculating...", width/2-1, height/2+1);
-  text("Recalculating...", width/2+1, height/2-1);
+  text("Calculating...", width/2-3, height/2+3);
+  text("Calculating...", width/2+1, height/2+1);
+  text("Calculating...", width/2-1, height/2-1);
+  text("Calculating...", width/2-1, height/2+1);
+  text("Calculating...", width/2+1, height/2-1);
   fill(255);
-  text("Recalculating...", width/2, height/2);
+  text("Calculating...", width/2, height/2);
   
   //todo: also determine which paths were affected by the new/modified obstacle
+}
+
+
+void checkShoppingList() {
+  checkShoppingList("");
+}
+
+void checkShoppingList(String checkMode) {
+  int prevNumPoints = 0;
+  
+  if (checkMode.equals(""))
+    prevNumPoints = requiredPoints.length;
+  
+  pointsList = new ArrayList<PVector>();
+  listPointFixtureIndices = new int[shoppingList.length];
+  
+  pointsList.add(entrance);
+  pointsList.add(exit);
+  //listPointFixtureIndices[0] = 0;
+  //listPointFixtureIndices[listPointFixtureIndices.length-1] = 1;
+  for (int i = 0; i < shoppingList.length; i++) {
+    PVector pos = findPosition(shoppingList[i]);
+    
+    if (pos.x != -1) {
+      pointsList.add(pos);
+      listPointFixtureIndices[i] = int(pos.z);
+    }
+    
+    else {  // if pos.x is -1, then the function was unable to find the item in any of the fixtures
+      println("Sorry,", "'" + shoppingList[i] + "'", "is not a product in this store. Perhaps you made a typo in your shopping list?");
+      //pointsList[i+1] = pointsList[i];
+      listPointFixtureIndices[i] = 0;
+    }
+      
+  }
+  
+  fixtureCounter = new boolean[fixtures.size()];
+  requiredPoints = new int[0];
+  for (int i = 0; i < listPointFixtureIndices.length; i++) {
+    int fixtureIndex = listPointFixtureIndices[i];
+    
+    if (!fixtureCounter[fixtureIndex] && fixtureIndex > 1) {
+      fixtureCounter[fixtureIndex] = true;
+      requiredPoints = append(requiredPoints, fixtureIndex);
+    }
+  }
+  
+  if (requiredPoints.length != prevNumPoints) {
+    recalcRequired = true;
+  }
 }
