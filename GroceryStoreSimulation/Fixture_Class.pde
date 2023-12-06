@@ -159,8 +159,7 @@ class Fixture {
     allDistances = new float[numFixtures][numFixtures];
     optimalPaths = new String[numFixtures][numFixtures];
     
-    if (displacements[0] != 0 || displacements[1] != 0)
-      recalcRequired = true;
+    recalcRequired = true;
     
     if (displacements[0] < 0)
       displacements[0] = -min(this.position[0] - 1, -displacements[0]);
@@ -189,8 +188,10 @@ class Fixture {
     allDistances = new float[numFixtures][numFixtures];
     optimalPaths = new String[numFixtures][numFixtures];
     
-    if (displacements[0] != 0 || displacements[1] != 0)
-      recalcRequired = true;
+    recalcRequired = true;
+    
+    displacements[0] = -min(this.position[0] - 1, -displacements[0]);
+    displacements[1] = -min(this.position[1] - 1, -displacements[1]);
       
     for (int i = 0; i < 4; i++) {
       if (this.mainSideCoords[i] == this.position[i % 2])

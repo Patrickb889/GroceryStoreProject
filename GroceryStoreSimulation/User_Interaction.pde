@@ -332,6 +332,7 @@ void renameFixture() {
   textbox.text = "";
 }
 
+//todo: if time, try to get delete working
 void deleteLastFixture() {
   //if (fixtures.size() == 2)
   //  return;
