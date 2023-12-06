@@ -90,15 +90,15 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   
   // initialization finished
   
-  //todo: make it so that middle points will not be chosen (like it was before)
+  //todo: make it so that middle points will not be chosen (like it was before)(done)
   // for each obstacle, only check two corners that are relevant (if three can be reached, second and third farthest, if two can be reached, two closest
   // when two can be reached, starting point within either width or height of obstacle (cross area)
   // when three can be reached, starting point anywhere but the cross area
   // use that knowledge to select the two points that should be checked
   // proceed as normal (same, just less corners, therefore less branches)
-  //if no time, just take order as provided in shopping list
-  //todo: clean up stinky code
-  //todo: if path to a corner point is blocked, closestcorner oof all obstacles becomes new point
+  //if no time, just take order as provided in shopping list(no)
+  //todo: clean up stinky code(will do)
+  //todo: if path to a corner point is blocked, closestcorner of all obstacles becomes new point
   // each step would involve each path moving forward by one line segment (max path length would go through each obstacle corner once)
   for (int step = -1; step < pathInfo.length - 1; step++) { //<>// //<>//
     // Loop through indices of current last points of each path
@@ -268,7 +268,7 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
 //}
 
 // Finds number of corners on an obstacle a point to get to directly (not accounting for other obstacles)
-//todo: implement this
+//todo: implement this(done)
 int unblockedCorners(PVector startPoint, int[] obCoords) {
   if (obCoords[0] < startPoint.x && startPoint.x < obCoords[2] || obCoords[1] < startPoint.y && startPoint.y < obCoords[3])  // if a point can only directly go two points on a rectangle, it must be positioned in the cross extending off the rectangle
     return 2;
@@ -374,12 +374,13 @@ PVector[] relevantCornerCoords(PVector startPoint, int[] obsCoords) {
 
 //todo: own pathfinding for all shoppers
 //todo: add second middle line for intersection finding(done)
-//todo: user decides order if not time
-//todo: user can drag points
+//todo: may change that to be one pixel to left/right/bottom/top
+//todo: user decides order if not time(no)
+//todo: user can drag points(done)
 
 
-//todo: figure out intersection not being caught (mostly positive slope lines)
-//figure out no intersections not being counted
+//todo: figure out intersection not being caught (mostly positive slope lines)(done)
+//figure out no intersections not being counted(done)
 // Checks if an obstacle is intersected by a path (checks for intersection between line segments involved)
 boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoords) {
     int x1 = (int) startCoords.x;
@@ -428,7 +429,7 @@ boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoord
 }
 
 
-
+//todo: fix pathfinding corner cutting
 
 boolean pathToCorner(PVector cornerCoords, PVector initialCoords, int obIndex) {
   int xStep = 0;

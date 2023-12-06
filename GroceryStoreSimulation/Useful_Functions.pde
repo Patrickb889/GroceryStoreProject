@@ -35,8 +35,9 @@ void recalculatePath() {
   pathFound = false;
   
   int numFixtures = fixtures.size();
-  allDistances = new float[numFixtures][numFixtures];
-  optimalPaths = new String[numFixtures][numFixtures];
+  println("A");
+  //allDistances = new float[numFixtures][numFixtures];
+  //optimalPaths = new String[numFixtures][numFixtures];
   
   textAlign(CENTER, CENTER);
   textSize(50);

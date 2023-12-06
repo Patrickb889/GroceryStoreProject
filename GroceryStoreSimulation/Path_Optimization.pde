@@ -3,6 +3,7 @@ float busyness = 0.5;
 
 // Uses greedy algorithm (doesn't always find the absolute best path, but is still able to find some pretty good approximations)
 void search(int pathLength) {
+  //printArray(optimalPaths[0]);
   float maxPriority = -1;
   int maxIndex = -1;
   int currPointIndex;
@@ -49,21 +50,21 @@ void search(int pathLength) {
 
 
 void updatePathInfo(int i, int j) {  //i < j
-  if (optimalPaths[i][j] != null)
-    return;
+  if (optimalPaths[i][j] == null || optimalPaths[i][j].equals("null") || i == modifiedFixture || j == modifiedFixture) {
     
-  PVector p1 = fixtures.get(i).defaultPoint;
-  PVector p2 = fixtures.get(j).defaultPoint;
-  
-  String[] pathInfo = pathFind(p1, p2, i, j);
-  
-  allDistances[i][j] = float(pathInfo[0]);
-  optimalPaths[i][j] = pathInfo[1];
+    PVector p1 = fixtures.get(i).defaultPoint;
+    PVector p2 = fixtures.get(j).defaultPoint;
+    
+    String[] pathInfo = pathFind(p1, p2, i, j);
+    
+    allDistances[i][j] = float(pathInfo[0]);
+    optimalPaths[i][j] = pathInfo[1];
+  }
 }
 
 // Calculates priority of a point (point with highest priority will be the next point in the path)
 float pointPriority(int currPointIndex, int nextPointIndex) {
-  //todo: add recalc shopping list func, fix this, if doesn't work, just get rid of deleteing func and hotkey
+  //todo: add recalc shopping list func, fix this, if doesn't work, just get rid of deleteing func(done) and hotkey(not done)
   float distToPoint, distToDest;
   
   if (pathAccuracy.equals("Accurate")) {

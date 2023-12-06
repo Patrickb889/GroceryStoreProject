@@ -10,7 +10,7 @@ ice cream
 post office
 pharmacy,medicine
 chocolate,candy
-noodles,tortillas,bread
+noodles,tortillas,bread,cereal
 ketchup,mustard,bbq sauce,salt,pepper,seasoning
 coffee,tea,hot chocolate
 beans,soup,sardines,evaporated milk
@@ -32,3 +32,7 @@ nutrient bars,fish oil,probiotics
 supplements,protein powder,creatine
 mugs,toys,games,decorations
 electronics,video games,guitars
+soap
+sunscreen,skincare
+gift cards,gift bags
+chocolate,candy,chips

@@ -121,6 +121,7 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
           // change valid next to only check intersection with other intersected obstacles (modify pot obs function to be able to take specific ones to include in search)
           // keep track of maxes for both sides, eventually just add maxes to nextPoints
           // if start to a corner intersects obstacle which is not one of the original obstacles, new point is first obstacle, corner closest to line segment (perp distance)
+          //more complicated: can take other side coords of these widest obstacles as well
         }
       }
     }

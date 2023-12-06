@@ -120,7 +120,14 @@ class Fixture {
     
     
     text(this.name, centreX, oneThirdY);
-    text(this.index, centreX, twoThirdsY);//str(this.stock) + "/" + str(this.maxStock)
+    
+    currWidth = textWidth(str(this.stock) + "/" + str(this.maxStock));
+    if (currWidth > maxWidth) {
+      fontSize *= (maxWidth/currWidth);
+      textSize(max(0.1, fontSize));
+    }
+    
+    text(str(this.stock) + "/" + str(this.maxStock), centreX, twoThirdsY);
     
     if (selectedFixture == this.index) {
       stroke(0, 107, 255);
@@ -147,6 +154,11 @@ class Fixture {
   }
   
   void move(int[] displacements) {
+    //todo: make better way to figure out things that need redoing intsead of redoing eberything
+    int numFixtures = fixtures.size();
+    allDistances = new float[numFixtures][numFixtures];
+    optimalPaths = new String[numFixtures][numFixtures];
+    
     if (displacements[0] != 0 || displacements[1] != 0)
       recalcRequired = true;
     
@@ -173,6 +185,10 @@ class Fixture {
   }
   
   void rescale(int[] displacements) {
+    int numFixtures = fixtures.size();
+    allDistances = new float[numFixtures][numFixtures];
+    optimalPaths = new String[numFixtures][numFixtures];
+    
     if (displacements[0] != 0 || displacements[1] != 0)
       recalcRequired = true;
       

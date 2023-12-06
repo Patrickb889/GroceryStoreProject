@@ -24,7 +24,7 @@ ArrayList<int[]> obstacles = new ArrayList<int[]>();
 
 String[] shoppingList;
 
-boolean showOtherShoppers = false;
+boolean showOtherShoppers = true;
 
 void setup() {
   size(800, 600);
@@ -130,6 +130,8 @@ void setup() {
     }
     
     fullPath = concat(new int[]{0}, append(requiredPoints, 1));
+    
+    pathFound = true;
   }
   
   else {
@@ -187,6 +189,8 @@ void draw() {
         search(pathLength);
       }
       
+      pathFound = true;
+      
       fullPath = concat(new int[]{0}, append(requiredPoints, 1));
       
       if (requiredPoints.length == 0)
@@ -233,9 +237,16 @@ void draw() {
     strokeWeight(1);
     for (PVector point : pointsList)
       circle(point.x, point.y, 8);
-  } //<>// //<>//
+  } //<>// //<>// //<>//
 
-
+  stroke(0);
+  strokeWeight(1);
+  
+  fill(0, 255, 0);
+  circle(entrance.x, entrance.y, 10);
+  
+  fill(255, 0, 0);
+  circle(exit.x, exit.y, 10);
 
   if (textbox.show) {
     stroke(0);
@@ -305,7 +316,7 @@ void draw() {
     optimalPaths = new String[numFixtures][numFixtures];
 
     for (int i = 0; i < numFixtures; i++) {
-      for (int j = i+1; j < numFixtures; j++) { //<>//
+      for (int j = i+1; j < numFixtures; j++) { //<>// //<>//
         PVector p1 = fixtures.get(i).defaultPoint;
         PVector p2 = fixtures.get(j).defaultPoint;
         

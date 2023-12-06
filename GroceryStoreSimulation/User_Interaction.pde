@@ -190,11 +190,14 @@ void mousePressed() {
     }
     
     editMode = "";
+    modifiedFixture = selectedFixture;
     selectedFixture = tempFixture;
+    
     
   }
 }
 
+int modifiedFixture;
 
 void mouseDragged() {
   if (selectedFixture == -1)
