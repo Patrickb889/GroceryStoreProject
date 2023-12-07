@@ -8,3 +8,4 @@ Milk,Yogurt,Cheese,Butter,Ice cream
 Ground beef,Steak,Chicken wings,Porkchops,Kebabs,Eggs
 Cookies,Muffins,Cupcakes,Bread,Brownies,Pie,Cake
 deez nuts
+apples

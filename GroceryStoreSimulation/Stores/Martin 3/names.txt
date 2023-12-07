@@ -8,3 +8,4 @@ Dairy
 Meat
 Baked Goods
 Meat
+Fruit
