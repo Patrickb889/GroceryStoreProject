@@ -52,6 +52,14 @@ public void replaceProductsClicked(GButton source, GEvent event) { //_CODE_:repl
   reenterProducts();
 } //_CODE_:replaceProducts:821293:
 
+public void recalculatePathButtonClicked(GButton source, GEvent event) { //_CODE_:recaluclatePathButton:975154:
+  int numFixtures = fixtures.size();
+      allDistances = new float[numFixtures][numFixtures];
+      optimalPaths = new String[numFixtures][numFixtures];
+      
+      recalculatePath(); //Manually recalculating the optimal path
+} //_CODE_:recaluclatePathButton:975154:
+
 
 
 // Create all the GUI controls. 
@@ -90,6 +98,9 @@ public void createGUI(){
   replaceProducts = new GButton(Window, 152, 264, 80, 30);
   replaceProducts.setText("Replace Products");
   replaceProducts.addEventHandler(this, "replaceProductsClicked");
+  recaluclatePathButton = new GButton(Window, 39, 154, 100, 40);
+  recaluclatePathButton.setText("Recalculate Optimal Path");
+  recaluclatePathButton.addEventHandler(this, "recalculatePathButtonClicked");
   Window.loop();
 }
 
@@ -104,3 +115,4 @@ GDropList fixturePresetsDropdown;
 GButton addFixtureButton; 
 GButton renameFixture; 
 GButton replaceProducts; 
+GButton recaluclatePathButton; 
