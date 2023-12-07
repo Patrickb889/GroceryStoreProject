@@ -348,6 +348,10 @@ void addFixture() {
   selectedFixture = fixtures.size() - 1;  // Select new fixture
   obstacles.add(fixtures.get(selectedFixture).position);  // Add new fixture's coords to obstacles
   
+  int numFixtures = selectedFixture + 1;
+  allDistances = new float[numFixtures][numFixtures];
+  optimalPaths = new String[numFixtures][numFixtures];
+  
   checkShoppingList();  // See if products of new fixture has changed anything
   
   textbox.text = "";
@@ -608,6 +612,13 @@ void saveStore() {
 
 // Loads a saved store given the name
 void load(String name) {
+  if (!loadQueued) {
+    loadQueued = true;
+    return;
+  }
+  
+  loadQueued = false;
+  
   loaded = true;
   pathCalculated = true;
   storeName = name;

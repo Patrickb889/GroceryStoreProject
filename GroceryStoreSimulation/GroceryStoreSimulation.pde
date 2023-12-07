@@ -34,6 +34,7 @@ int numShoppers = 5;
 
 boolean pathCalculated = pathAccuracy.equals("Approx");  // When pathCalculated is false, the program will calculate the best path between every single pair of fixtures (approx mode does not need this so it would be set to true)
 boolean pathFound = false;  // Indicates whether or not an overall path (not the paths between fixtures) has been calculated
+boolean loadQueued = false;  // Prevents ConcurrentModificationException if a store is loaded while fixtures are being drawn
 
 boolean[] fixtureCounter;  // Keeps track of all the fixtures that have been accounted for already when checking which fixtures need to be visited
 ArrayList<ArrayList<int[]>> paths = new ArrayList<ArrayList<int[]>>();  // Stores every complete path (stored as indices of all points passed) between two points found by the pathfinding function
@@ -41,8 +42,8 @@ ArrayList<ArrayList<int[]>> paths = new ArrayList<ArrayList<int[]>>();  // Store
 
 ArrayList<PVector> pointsList = new ArrayList<PVector>();  // Used to draw circles at all major points in the path
 
-int[] listPointFixtureIndices;  // Indidices of all fixtures that need to be visited according to shopping list (contains repeated indices)
-int[] requiredPoints;  // Same as above but does not contain repeats
+int[] listPointFixtureIndices = {};  // Indidices of all fixtures that need to be visited according to shopping list (contains repeated indices)
+int[] requiredPoints = {};  // Same as above but does not contain repeats
 int[] fullPath;  // Used to draw the complete path from entrance to exit
 
 void setup() {
@@ -97,11 +98,16 @@ void setup() {
   fixtures.add(new Fixture(entrance));
   fixtures.add(new Fixture(exit));
   
-  load("Shoppers");  //demo saved store//todo: change this to gui
+  //load("Shoppers");  //demo saved store//todo: change this to gui
   
-  if (!loaded)
-    checkShoppingList("Initial");  // Check user's shopping list to figure out which fixtures need visiting
-                                   // The function checks the previous amount of fixtures that needed visiting to determine whether or not the path had to be recalculated so "Initial" just tells the function not to do this
+  if (!loaded) {
+    pointsList.add(entrance);
+    pointsList.add(exit);
+    
+    allDistances = new float[2][2];
+    optimalPaths = new String[2][2];
+  }
+
 }
 
 
@@ -112,6 +118,9 @@ void draw() {
   // Draw all fixtures
   for (Fixture f : fixtures)
     f.drawMe();
+    
+  if (loadQueued)
+    load(loadStore.getSelectedText());
     
   // Draws the final path if calculation is finished
   // Only done if no fixture is being selected for editing (when selectedFixture == -1)
@@ -174,7 +183,7 @@ void draw() {
         if (i == path.length - 1)
           p2 = fixtures.get(i2).defaultPoint;
         
-        
+         //<>//
         line(p1.x, p1.y, p2.x, p2.y);
       }
     }
@@ -268,7 +277,7 @@ void draw() {
     //      click near top left corner (within certain radius) and drag to resize (top left corner x and y changed to mouseX and mouseY, top right corner y changed to mouseY, bottom left corner x changed to mouseX)
     //      everything is recalculated (pathCalculated set to false, relevant lists updated) when deselected (when click on background) and when text has been entered into popup box
     //  pre gui: rmb to bring up fixture options (just text showing which button for which fixture type)(done)
-    //  num key creates new fixture with random coords and main side and auto selects it(done)
+    //  num key creates new fixture with random coords and main side and auto selects it(done) //<>//
     //  box will then pop up and user can enter products for the fixture (item names can have spaces but separate items with a dash and no space)(done)
     //  c to change to random colour(done)
     //  C to change to custom rgb value (same entering mechanism as items, separate values by a dash with no space)(done)
