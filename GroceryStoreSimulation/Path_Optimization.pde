@@ -61,17 +61,24 @@ void search(int pathLength) {
 
 // Calls pathFind() to update allDistance and optimalPaths
 void updatePathInfo(int i, int j) {  //i < j
+  boolean updateRequired = false;
+  
   // Only updates if the required path is currently uncalculated, or if any of the points involved has been modified
-  if (optimalPaths[i][j] == null || optimalPaths[i][j].equals("null") || fixtures.get(i).defPointModified || fixtures.get(j).defPointModified) {
+  if (optimalPaths[i][j] == null || fixtures.get(i).defPointModified || fixtures.get(j).defPointModified)
+    updateRequired = true; //<>//
+  else if (optimalPaths[i][j].equals("null"))  // Put this condition in separate if statement to prevent NullPointerException
+    updateRequired = true;
+    
+  if (updateRequired) {
     PVector p1 = fixtures.get(i).defaultPoint;
     PVector p2 = fixtures.get(j).defaultPoint;
     
     String[] pathInfo = pathFind(p1, p2, i, j);
-     //<>//
+    
     allDistances[i][j] = float(pathInfo[0]);
     optimalPaths[i][j] = pathInfo[1];
-    
   }
+    
 }
 
 // Calculates priority of a point (point with highest priority will be the next point in the path)

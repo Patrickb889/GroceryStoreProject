@@ -1,3 +1,2 @@
-Martin 3
-Test 1
-Shoppers
+MartinMart (demo)
+Shoppers (demo)
