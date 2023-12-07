@@ -3,14 +3,12 @@ class Shopper {
   PVector position, direction, velocity, destination;
   float cartSpace, speed;
   ArrayList<Item> items = new ArrayList();
-  ArrayList<String> shoppingList;
   
   //Constructor
-  Shopper(float x, float y, float s, ArrayList<String> sL) {
+  Shopper(float x, float y, float s) {
    this.position = new PVector(x, y); //Position of the shopper
    this.cartSpace = 1500; //volume of the cart in cubic centimeters
    this.speed = s; //Speed of the shoper for the drawing
-   this.shoppingList = sL; //The items the shopper needs to get as strings in an array list
    this.destination = new PVector(round(random(0, width)), round(random(0, height)));
    this.updateVel();
   }
@@ -52,6 +50,7 @@ class Shopper {
     circle(this.position.x, this.position.y, 10);
   }
   
+  //todo: delete if not needed
   void grabItem(Fixture f) {
     if (f.type != "Counter") {
       int numGrabbed = round(random(1, min(10, f.stock)));
