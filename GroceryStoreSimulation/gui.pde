@@ -18,11 +18,11 @@ synchronized public void win_draw1(PApplet appc, GWinData data) { //_CODE_:Windo
   appc.background(230);
 } //_CODE_:Window:634332:
 
-public void colourChangeClicked(GButton source, GEvent event) { //_CODE_:colourChange:897214:
+public void randomColourChangeClicked(GButton source, GEvent event) { //_CODE_:randomColourChange:897214:
   if(!textbox.show){
    changeFixtureColour("Random");
   }
-} //_CODE_:colourChange:897214:
+} //_CODE_:randomColourChange:897214:
 
 public void addProductsClicked(GButton source, GEvent event) { //_CODE_:addProducts:854692:
    addProducts();
@@ -60,6 +60,43 @@ public void recalculatePathButtonClicked(GButton source, GEvent event) { //_CODE
       recalculatePath(); //Manually recalculating the optimal path
 } //_CODE_:recaluclatePathButton:975154:
 
+public void saveStoreButtonClicked(GButton source, GEvent event) { //_CODE_:saveStoreButton:984468:
+  if(!textbox.show && selectedFixture == -1) {
+   saveStore(); 
+  }
+} //_CODE_:saveStoreButton:984468:
+
+public void exactColourChangeClicked(GButton source, GEvent event) { //_CODE_:exactColourChange:526100:
+  if(!textbox.show){
+   changeFixtureColour("Custom"); 
+  }
+} //_CODE_:exactColourChange:526100:
+
+public void duplicateClicked(GButton source, GEvent event) { //_CODE_:duplicate:500062:
+  Fixture f = fixtures.get(0);
+  
+  if (selectedFixture != -1) {
+    f = fixtures.get(selectedFixture);  // Currently selected fixture
+  }
+  
+  if(selectedFixture > 0) {
+   // Same position, main side, type, name, max stock, restock chance, colour, and default point, but blank list of products
+    fixtures.add(new Fixture(subset(f.position, 0), subset(f.mainSideCoords, 0), f.type, f.name, new String[]{}, f.maxStock, f.restockChance, f.colour, new PVector(f.defaultPoint.x, f.defaultPoint.y)));
+    
+    selectedFixture = fixtures.size() - 1;
+    Fixture newF = fixtures.get(selectedFixture);
+    
+    newF.move(new int[]{10, 10});  // Move it a little so that the new fixture isn't sitting right on top of the old one
+    obstacles.add(newF.position);
+    
+    // Prepare for path recalculation
+    recalcRequired = true;
+    int numFixtures = fixtures.size();
+    allDistances = new float[numFixtures][numFixtures];
+    optimalPaths = new String[numFixtures][numFixtures]; 
+  }
+} //_CODE_:duplicate:500062:
+
 
 
 // Create all the GUI controls. 
@@ -69,45 +106,87 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
   surface.setTitle("Sketch Window");
-  Window = GWindow.getWindow(this, "Window title", 0, 0, 300, 400, JAVA2D);
+  Window = GWindow.getWindow(this, "Window title", 0, 0, 300, 470, JAVA2D);
   Window.noLoop();
   Window.setActionOnClose(G4P.KEEP_OPEN);
   Window.addDrawHandler(this, "win_draw1");
-  colourChange = new GButton(Window, 37, 204, 100, 40);
-  colourChange.setTextAlign(GAlign.MIDDLE, GAlign.MIDDLE);
-  colourChange.setText("Change Fixture Colour");
-  colourChange.addEventHandler(this, "colourChangeClicked");
-  addProducts = new GButton(Window, 158, 205, 100, 40);
+  randomColourChange = new GButton(Window, 25, 370, 100, 40);
+  randomColourChange.setText("Change Fixture Colour-Random");
+  randomColourChange.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
+  randomColourChange.addEventHandler(this, "randomColourChangeClicked");
+  addProducts = new GButton(Window, 175, 320, 100, 40);
   addProducts.setText("Add Products To Fixture");
+  addProducts.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   addProducts.addEventHandler(this, "addProductsClicked");
-  loadStore = new GDropList(Window, 49, 61, 90, 80, 3, 10);
+  loadStore = new GDropList(Window, 25, 80, 100, 100, 3, 10);
   loadStore.setItems(loadStrings("list_472118"), 0);
+  loadStore.setLocalColorScheme(GCScheme.RED_SCHEME);
   loadStore.addEventHandler(this, "dropList1_click1");
-  loadStoreButton = new GButton(Window, 55, 12, 80, 30);
+  loadStoreButton = new GButton(Window, 25, 30, 100, 40);
   loadStoreButton.setText("Load Store");
+  loadStoreButton.setLocalColorScheme(GCScheme.RED_SCHEME);
   loadStoreButton.addEventHandler(this, "loadStoreButtonClicked");
-  fixturePresetsDropdown = new GDropList(Window, 149, 58, 90, 120, 5, 10);
+  fixturePresetsDropdown = new GDropList(Window, 175, 80, 100, 150, 5, 10);
   fixturePresetsDropdown.setItems(loadStrings("list_951029"), 0);
+  fixturePresetsDropdown.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   fixturePresetsDropdown.addEventHandler(this, "FixturePresetsDropdownChanged");
-  addFixtureButton = new GButton(Window, 160, 10, 80, 30);
+  addFixtureButton = new GButton(Window, 175, 30, 100, 40);
   addFixtureButton.setText("Add Fixture");
+  addFixtureButton.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   addFixtureButton.addEventHandler(this, "addFixtureButtonClicked");
-  renameFixture = new GButton(Window, 50, 253, 80, 30);
+  renameFixture = new GButton(Window, 175, 270, 100, 40);
   renameFixture.setText("Rename Fixture");
+  renameFixture.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   renameFixture.addEventHandler(this, "renameFixtureClicked");
-  replaceProducts = new GButton(Window, 152, 264, 80, 30);
-  replaceProducts.setText("Replace Products");
+  replaceProducts = new GButton(Window, 175, 370, 100, 40);
+  replaceProducts.setText("Replace Products In Fixture");
+  replaceProducts.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   replaceProducts.addEventHandler(this, "replaceProductsClicked");
-  recaluclatePathButton = new GButton(Window, 39, 154, 100, 40);
+  recaluclatePathButton = new GButton(Window, 25, 270, 100, 40);
   recaluclatePathButton.setText("Recalculate Optimal Path");
   recaluclatePathButton.addEventHandler(this, "recalculatePathButtonClicked");
+  saveStoreButton = new GButton(Window, 25, 190, 100, 40);
+  saveStoreButton.setText("Save Store");
+  saveStoreButton.setLocalColorScheme(GCScheme.RED_SCHEME);
+  saveStoreButton.addEventHandler(this, "saveStoreButtonClicked");
+  exactColourChange = new GButton(Window, 25, 420, 100, 40);
+  exactColourChange.setText("Change Fixture Colour-Exact");
+  exactColourChange.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
+  exactColourChange.addEventHandler(this, "exactColourChangeClicked");
+  duplicate = new GButton(Window, 175, 420, 100, 40);
+  duplicate.setText("Duplicate Fixture");
+  duplicate.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
+  duplicate.addEventHandler(this, "duplicateClicked");
+  storeLabel = new GLabel(Window, 25, 10, 100, 20);
+  storeLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  storeLabel.setText("Store");
+  storeLabel.setLocalColorScheme(GCScheme.RED_SCHEME);
+  storeLabel.setOpaque(false);
+  createFixtureLabel = new GLabel(Window, 175, 10, 100, 20);
+  createFixtureLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  createFixtureLabel.setText("Creating Fixtures");
+  createFixtureLabel.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  createFixtureLabel.setOpaque(false);
+  pathfindingLabel = new GLabel(Window, 25, 250, 100, 20);
+  pathfindingLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  pathfindingLabel.setText("Optimal Path");
+  pathfindingLabel.setOpaque(false);
+  editingLabel = new GLabel(Window, 175, 250, 100, 20);
+  editingLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  editingLabel.setText("Editing Fixtures");
+  editingLabel.setOpaque(false);
+  colourLabel = new GLabel(Window, 20, 350, 110, 20);
+  colourLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  colourLabel.setText("Changing Colours");
+  colourLabel.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
+  colourLabel.setOpaque(false);
   Window.loop();
 }
 
 // Variable declarations 
 // autogenerated do not edit
 GWindow Window;
-GButton colourChange; 
+GButton randomColourChange; 
 GButton addProducts; 
 GDropList loadStore; 
 GButton loadStoreButton; 
@@ -116,3 +195,11 @@ GButton addFixtureButton;
 GButton renameFixture; 
 GButton replaceProducts; 
 GButton recaluclatePathButton; 
+GButton saveStoreButton; 
+GButton exactColourChange; 
+GButton duplicate; 
+GLabel storeLabel; 
+GLabel createFixtureLabel; 
+GLabel pathfindingLabel; 
+GLabel editingLabel; 
+GLabel colourLabel; 
