@@ -2,14 +2,8 @@ Carrots
 cleaning supplies
 Bananas
 Milk
-Orangs
-Ornges
 Butter
-Onarges
-Ngornes
-Ongares
 Cake
-Goranges
 Eggs
 Medicine
 ice cream
@@ -32,4 +26,3 @@ cereal
 noodles
 toilet paper
 Broccoli
-deez nuts

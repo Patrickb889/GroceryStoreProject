@@ -1,3 +1,6 @@
+//Importing the g4p controls
+import g4p_controls.*;
+
 // Names of all saved stores which will be pulled from a file
 String[] storeNames;
 
@@ -43,11 +46,16 @@ int[] requiredPoints;  // Same as above but does not contain repeats
 int[] fullPath;  // Used to draw the complete path from entrance to exit
 
 void setup() {
+  createGUI();
+  
   size(800, 600);
   
   // Load in store names and shopping list items
   storeNames = loadStrings("Stores/store_names.txt");
   shoppingList = loadStrings("ShoppingList/shopping_list.txt");
+  
+  //Dropdown stores for GUI
+  loadStore.setItems(storeNames, 0);
   
   // In case the user has not added a shopping list, or put it in the wrong place, or named it incorrectly
   if (shoppingList == null) {
@@ -79,6 +87,11 @@ void setup() {
   fixturePresets.add(new FixturePreset("Counter", 1, 0, new PVector(0, 255, 100)));
   fixturePresets.add(new FixturePreset("Custom", 200, 1/(frameRate*10), new PVector(255, 255, 255)));  //todo: create sliders to adjust maxStock and restockChance for any selected fixture
   //todo: if not doing shopper pathing, take out restock chance
+  
+  //Dropdown for the fixture presets
+  for(int i = 0; i < fixturePresets.size(); i++) {
+   fixturePresetsDropdown.addItem(str(i+1) + ")" + fixturePresets.get(i).name + " " + fixturePresets.get(i).type); 
+  }
   
   // Program starts with nothing but an entrance and an exit (user can add things to the store, or load a saved store)
   fixtures.add(new Fixture(entrance));
