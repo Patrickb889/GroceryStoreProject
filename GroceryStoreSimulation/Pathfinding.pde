@@ -171,10 +171,14 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
 // Finds all the meaningful points (corners of obstacles in the way) a path could go to next from its current point
 void getNextValidPoints(PVector currPoint, PVector destination, PVector startingPoint, float distSoFar, int pointIndex) {
   int obsToDest = 0;
+  float angleToDest = new PVector(destination.x - currPoint.x, destination.y - currPoint.y).heading();//
   
   // If distance of path so far + minimum possible distance to destination is already greater than minimum already found, no point in getting next points
   if (distSoFar + dist(currPoint.x, currPoint.y, destination.x, destination.y) >= minDist && minDist != -1)
     return;
+  
+  ArrayList<PVector> leftSideObsCorners = new ArrayList<PVector>();//
+  ArrayList<PVector> rightSideObsCorners = new ArrayList<PVector>();//
   
   // Loop through all obstacles
   for (int i = 0; i < obstacles.size(); i++) {
@@ -183,7 +187,20 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
     if (intersectionFound(obsCoords, currPoint, destination)) {
       obsToDest += 1;
       
+      
       PVector[] corners = cornerCoords(obsCoords);//relevantCornerCoords(currPoint, obsCoords);//todo: delete relevantCornerCoords if not needed
+      
+      for (PVector corn : corners) {//
+        float angle = new PVector(corn.y - currPoint.y, corn.x - currPoint.x).heading();//
+        
+        if (angleToDest - PI/2 <= angle && angle <= angleToDest || angleToDest <= PI/2 && angle >= angleToDest + 3*PI/2)
+          leftSideObsCorners.add(corn);
+          
+        else if (angleToDest <= angle && angle <= angleToDest + PI/2 || angleToDest >= 3*PI/2 && angle <= angleToDest - 3*PI/2)
+          rightSideObsCorners.add(corn);
+          
+        
+      }
       
       // Loop through all 4 corners
       for (int c = 0; c < 4; c++) {
