@@ -46,6 +46,9 @@ int[] listPointFixtureIndices = {};  // Indidices of all fixtures that need to b
 int[] requiredPoints = {};  // Same as above but does not contain repeats
 int[] fullPath;  // Used to draw the complete path from entrance to exit
 
+boolean animatePath = false;  // When set to true, animates a dot moving along the calculated path
+Shopper shopper;
+
 void setup() {
   createGUI();
   
@@ -71,23 +74,24 @@ void setup() {
   text("Loading...", 400, 275);
   
   // Initialize indicated number of shoppers if user wants to see other shoppers
-  if (showOtherShoppers) {
-    for (int i = 0; i < 5; i++) {
-      shoppers.add(new Shopper(entrance.x, entrance.y, random(0.5, 2)));
-    }
-  }
+  //if (showOtherShoppers) {
+  //  for (int i = 0; i < 5; i++) {
+  //    shoppers.add(new Shopper(entrance.x, entrance.y, random(0.5, 2)));
+  //  }
+  //}
+  shopper = new Shopper(entrance.x, entrance.y, 2);
+  
   
   // Hard-coded fixture presets (cannot be modified by the user unless they change the code)
   // (fixture type, product category, maximum stock, restock chance, colour)
-  fixturePresets.add(new FixturePreset("Display", "Fruit", 200, 1/(frameRate*10), new PVector(255, 255, 0)));  // Colours are set as PVectors because this allows the colours of a preset and all its fixtures to be linked
-  fixturePresets.add(new FixturePreset("Display", "Veg", 200, 1/(frameRate*10), new PVector(100, 255, 0)));
-  fixturePresets.add(new FixturePreset("Shelf", "Veg", 400, 1/(frameRate*10), new PVector(100, 255, 0)));
-  fixturePresets.add(new FixturePreset("Fridge", "Dairy", 30, 1/(frameRate*20), new PVector(200, 200, 255)));
-  fixturePresets.add(new FixturePreset("Fridge", "Meat", 50, 1/(frameRate*15), new PVector(255, 0, 0)));
-  fixturePresets.add(new FixturePreset("Display", "Pastries", 20, 1/(frameRate*30), new PVector(177, 137, 75)));
-  fixturePresets.add(new FixturePreset("Counter", 1, 0, new PVector(0, 255, 100)));
-  fixturePresets.add(new FixturePreset("Custom", 200, 1/(frameRate*10), new PVector(255, 255, 255)));  //todo: create sliders to adjust maxStock and restockChance for any selected fixture
-  //todo: if not doing shopper pathing, take out restock chance
+  fixturePresets.add(new FixturePreset("Display", "Fruit", 200, new PVector(255, 255, 0)));  // Colours are set as PVectors because this allows the colours of a preset and all its fixtures to be linked
+  fixturePresets.add(new FixturePreset("Display", "Veg", 200, new PVector(100, 255, 0)));
+  fixturePresets.add(new FixturePreset("Shelf", "Veg", 400, new PVector(100, 255, 0)));
+  fixturePresets.add(new FixturePreset("Fridge", "Dairy", 30, new PVector(200, 200, 255)));
+  fixturePresets.add(new FixturePreset("Fridge", "Meat", 50, new PVector(255, 0, 0)));
+  fixturePresets.add(new FixturePreset("Display", "Pastries", 20, new PVector(177, 137, 75)));
+  fixturePresets.add(new FixturePreset("Counter", 1, new PVector(0, 255, 100)));
+  fixturePresets.add(new FixturePreset("Custom", 200, new PVector(255, 255, 255)));
   
   //Dropdown for the fixture presets
   for(int i = 0; i < fixturePresets.size(); i++) {
@@ -183,7 +187,7 @@ void draw() {
         if (i == path.length - 1)
           p2 = fixtures.get(i2).defaultPoint;
         
-         //<>//
+        
         line(p1.x, p1.y, p2.x, p2.y);
       }
     }
@@ -196,10 +200,18 @@ void draw() {
     // Draw the major points (points where the user would grab an item) in the path
     for (PVector point : pointsList)
       circle(point.x, point.y, 8);
-  } //<>//
+  }
 
   stroke(0);
   strokeWeight(1);
+  
+  if (pathCalculated && selectedFixture == -1) {
+    if (animatePath) {
+      shopper.updateMe();
+      shopper.drawMe(); //<>//
+      
+    }
+  }
   
   // Green dot at entrance point
   fill(0, 255, 0);
@@ -237,15 +249,6 @@ void draw() {
     text(textbox.notes, 400, 325);  // Additional instructions for the user
   }
   
-  // todo (fix)://todo: keep for now but delete before submitting if not used
-  //pathFind(new PVector(700, 500), new PVector(round(random(0, 100)), round(random(0, 599))));
-  //shortestDistancesCopy = new float[obstacles.length * 4 + 1][2];
-  //for (int i = 0; i < shortestDistances.length; i++) {
-  //  for (int j = 0; j < 2; j++)
-  //    shortestDistancesCopy[i][j] = shortestDistances[i][j];
-  //}
-  
-  
   // Show additional information for selected fixture
   if (showFixtureInfo) {
     Fixture f = fixtures.get(selectedFixture);
@@ -265,23 +268,7 @@ void draw() {
     
   }
   
-  if (!pathCalculated && pathAccuracy.equals("Accurate")) {
-    //todo: use for user manual then delete
-    //todo: customization (when fixture moved or resized or rotated, obstacles and pointsList need to be updated as well an pathCalculated should be set to false)
-    //      click on fixture to select, when selected, default edge will be highlighted in diff colour and with thicker line, top left corner will have circle around it, also default point with have circle around it (default point circle will be diff colour)
-    //      click on main body to set move to true, on top left to set resize to true, on default point to set moveDefaultPoint to true
-    //      when moveDefaultPoint true, if main side horizontal, default point x follows mouseX as long as in bounds of main side, if main side vert, same but with y
-    //      right to rotate clockwise 90 deg (centreX + (point.y - centreY), centreY + (point.x - centreX)), update default edge (it will still be the same points around the edge)
-    //      left to rotate counterclockwise 90 deg (centreX - (point.y - centreY), centreY - (point.x - centreX)
-    //      click on main body and drag to move (all x and y shift by mouseX - prevMouseX or mouseY - prevMouseY)
-    //      click near top left corner (within certain radius) and drag to resize (top left corner x and y changed to mouseX and mouseY, top right corner y changed to mouseY, bottom left corner x changed to mouseX)
-    //      everything is recalculated (pathCalculated set to false, relevant lists updated) when deselected (when click on background) and when text has been entered into popup box
-    //  pre gui: rmb to bring up fixture options (just text showing which button for which fixture type)(done)
-    //  num key creates new fixture with random coords and main side and auto selects it(done) //<>//
-    //  box will then pop up and user can enter products for the fixture (item names can have spaces but separate items with a dash and no space)(done)
-    //  c to change to random colour(done)
-    //  C to change to custom rgb value (same entering mechanism as items, separate values by a dash with no space)(done)
-    //next todo: speed up recalculation, give other shoppers simple path finding
+  if (!pathCalculated && pathAccuracy.equals("Accurate")) { //<>//
     
     // Initialize 2D arrays for storing distances and paths between pairs of points
     int numFixtures = fixtures.size();

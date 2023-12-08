@@ -65,7 +65,7 @@ void updatePathInfo(int i, int j) {  //i < j
   
   // Only updates if the required path is currently uncalculated, or if any of the points involved has been modified
   if (optimalPaths[i][j] == null || fixtures.get(i).defPointModified || fixtures.get(j).defPointModified)
-    updateRequired = true; //<>//
+    updateRequired = true;
   else if (optimalPaths[i][j].equals("null"))  // Put this condition in separate if statement to prevent NullPointerException
     updateRequired = true;
     

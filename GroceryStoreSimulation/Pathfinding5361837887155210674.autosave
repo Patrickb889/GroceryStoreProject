@@ -1,7 +1,16 @@
+//todo: delete if not needed
+//todo: for subsequent, if point has data in copy array, get dist, and if dist smaller than minDist, store dist as minDist and index as minIndex
+// afterwards, if minIndex has data in both arrays, backtrack in both directions, otherwise just backtrack normally
+// whenever a complete path is found, if total distance less than current min for index of either first common point between new and copy, or last non end point in path,
+// replace this at the index
+// after all searching and drawing is done, use all info stored in this array to update copy array with new distances (start at last point before common point or second last point if no common point)
+// backtrack through path according to new array, at any given index, update copy array to have distance = total - partial distance according to new array and index = previous index
+
 // INITIALIZATION
 ArrayList<PVector> nextSteps = new ArrayList<PVector>();  // The next points selected during each step of searching
 int[][] viableNextSteps = new int[obstacles.size() * 4 + 1][];  // Viable next points from each corner, +1 so that no corner has index 0 (when finding corner index, object index * 4 + corner# + 1), index 0 is start point
 float[][] shortestDistances = new float[obstacles.size() * 4 + 1][2];  // Index 0 is distance of shortest path to the point, index 1 is index of point it came from to get that distance (only for current search step)
+float[][] shortestDistancesCopy = new float[obstacles.size() * 4 + 1][2];//todo: delete if not needed
 float[][][] pathInfo = new float[obstacles.size() * 4][obstacles.size() * 4 + 1][2];  // Index 0 is dist so far, index 1 is last point index (difference is that it stores these values for every single search step)
 
 int obsLen = obstacles.size();
@@ -21,6 +30,7 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   viableNextSteps = new int[obstacles.size() * 4 + 1][];
   shortestDistances = new float[obstacles.size() * 4 + 1][2];
   pathInfo = new float[obstacles.size() * 4][obstacles.size() * 4 + 1][2];
+  //todo: may not need pathInfo
   obsLen = obstacles.size();
   
   currPoints = new ArrayList<int[]>();
@@ -31,11 +41,12 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
   minDist = -1;
   minIndex = -1;
   
+  
   currPoints.add(new int[]{0});  // Add the start point as the first point
   
-  // INITIALIZATION FINISHED //
+  // Initialization finished //
   
-  
+  //todo: if path to a corner point is blocked, closestcorner of all obstacles becomes new point
   // Each step would involve each path moving forward by one line segment (max path length would go through each obstacle corner once)
   for (int step = -1; step < pathInfo.length - 1; step++) {
     // Loop through indices of current last points of each path
@@ -58,6 +69,17 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
         dist = pathInfo[step][i][0];
       }
         
+      //todo (fix)://todo: delete if not needed
+      //if (shortestDistancesCopy[i][0] != 0) {
+      //  println(i);
+      //  float totalDist = dist + shortestDistancesCopy[i][0];
+      //  if (minDist == -1 || totalDist < minDist) {
+      //    minDist = dist;
+      //    minIndex = i;
+      //  }
+        
+      //  //float partialDist = dist(
+      //}
           
       // If no data in terms of optimal next steps from the current corner, create empty array and call function to get the required data
       if (viableNextSteps[i] == null) {
@@ -146,17 +168,19 @@ String[] pathFind(PVector start, PVector end, int startIndex, int endIndex) {
 }
 
 
+boolean[] obsCounter;
 // Finds all the meaningful points (corners of obstacles in the way) a path could go to next from its current point
 void getNextValidPoints(PVector currPoint, PVector destination, PVector startingPoint, float distSoFar, int pointIndex) {
   int obsToDest = 0;
-  float angleToDest = new PVector(destination.x - currPoint.x, destination.y - currPoint.y).heading();//
+  obsCounter = new boolean[obsLen];
+  ArrayList<int[]> obsFound = new ArrayList<int[]>();
   
   // If distance of path so far + minimum possible distance to destination is already greater than minimum already found, no point in getting next points
   if (distSoFar + dist(currPoint.x, currPoint.y, destination.x, destination.y) >= minDist && minDist != -1)
     return;
   
-  ArrayList<PVector> leftSideObsCorners = new ArrayList<PVector>();//
-  ArrayList<PVector> rightSideObsCorners = new ArrayList<PVector>();//
+  if (currPoint.x == 675)
+    println("A");
   
   // Loop through all obstacles
   for (int i = 0; i < obstacles.size(); i++) {
@@ -164,52 +188,78 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
     
     if (intersectionFound(obsCoords, currPoint, destination)) {
       obsToDest += 1;
+      obsCounter[i] = true;
+      obsFound.add(append(obsCoords, i));
+    }
+  }
+  
+  for (int[] obsCoords : obsFound) {
+    PVector[] corners = cornerCoords(obsCoords);//relevantCornerCoords(currPoint, obsCoords);//todo: delete relevantCornerCoords if not needed
       
+    // Loop through all 4 corners
+    for (int c = 0; c < 4; c++) {
+      PVector corner = corners[c];
       
-      PVector[] corners = cornerCoords(obsCoords);
+      if (corner.equals(currPoint))//todo: delete if relevantCornerCoords not needed
+        continue;
       
-      for (PVector corn : corners) {//
-        float angle = new PVector(corn.y - currPoint.y, corn.x - currPoint.x).heading();//
+      // Check if there are any obstacles between the current point and the potential next point
+      if (!obsPresent(currPoint, corner)) {
+        float dist = distSoFar + dist(currPoint.x, currPoint.y, corner.x, corner.y);  // Distance of new path
+        int cornerIndex = obsCoords[4]*4 + c + 1;  // obstacle index * 4 + corner index + 1 (+1 to account for entrance coords at index 0)
         
-        if (angleToDest - PI/2 <= angle && angle <= angleToDest || angleToDest <= PI/2 && angle >= angleToDest + 3*PI/2)
-          leftSideObsCorners.add(corn);
+        // Information for the next point in shortestDistances will be replaced if it is empty (array {0, 0}), or if the current distance is less than the distance previously found
+        if (shortestDistances[cornerIndex][0] == 0 || dist < shortestDistances[cornerIndex][0]) {
+          // If the point has already been added to nextPoints, no need to add again
+          if (nextPointsCounter[cornerIndex] == 0) {
+            nextPointsCounter[cornerIndex] = 1;
+            nextPoints.add(new int[]{cornerIndex});  // Only add if not already added
+          }
+
+          viableNextSteps[pointIndex] = append(viableNextSteps[pointIndex], cornerIndex);
           
-        else if (angleToDest <= angle && angle <= angleToDest + PI/2 || angleToDest >= 3*PI/2 && angle <= angleToDest - 3*PI/2)
-          rightSideObsCorners.add(corn);
-          
-        
+          // If new path is shorter than previous path, discard the corner checked from the list of the point that came right before the corner in the previous path
+          if (shortestDistances[cornerIndex][0] != 0)
+            viableNextSteps[(int) shortestDistances[cornerIndex][1]] = discard(viableNextSteps[(int) shortestDistances[cornerIndex][1]], cornerIndex);
+            
+          // Overwrite info in shortestDistances
+          shortestDistances[cornerIndex][0] = dist;
+          shortestDistances[cornerIndex][1] = pointIndex;
+        }
       }
       
-      // Loop through all 4 corners
-      for (int c = 0; c < 4; c++) {
-        PVector corner = corners[c];
+      else if (newObsPresent(currPoint, corner) && !initialObsPresent(currPoint, corner)) {
+        println(currPoint, corner);
+        String[] pathInfo = pathFind(currPoint, corner, pointIndex, (int) corner.z);
+    
+        int[] path = int(split(pathInfo[1], "-"));
+        float currDist = distSoFar;
         
-        // Check if there are any obstacles between the current point and the potential next point
-        if (!obsPresent(currPoint, corner)) {
-          float dist = distSoFar + dist(currPoint.x, currPoint.y, corner.x, corner.y);  // Distance of new path
-          int cornerIndex = i*4 + c + 1;  // obstacle index * 4 + corner index + 1 (+1 to account for entrance coords at index 0)
+        for (int ind = path.length - 2; ind >= 0; ind--) {
+          int i1 = path[ind+1];
+          int i2 = path[ind];
           
-          // Information for the next point in shortestDistances will be replaced if it is empty (array {0, 0}), or if the current distance is less than the distance previously found
-          if (shortestDistances[cornerIndex][0] == 0 || dist < shortestDistances[cornerIndex][0]) {
-            // If the point has already been added to nextPoints, no need to add again
-            if (nextPointsCounter[cornerIndex] == 0) {
-              nextPointsCounter[cornerIndex] = 1;
-              nextPoints.add(new int[]{cornerIndex});  // Only add if not already added
-            }
-
-            viableNextSteps[pointIndex] = append(viableNextSteps[pointIndex], cornerIndex);
+          PVector p1 = pointCoords(i1);
+          PVector p2 = pointCoords(i2);
+          
+          if (ind == path.length - 2)
+            p1 = currPoint;
+          if (ind == 0)
+            p2 = corner;
             
-            // If new path is shorter than previous path, discard the corner checked from the list of the point that came right before the corner in the previous path
-            if (shortestDistances[cornerIndex][0] != 0)
-              viableNextSteps[(int) shortestDistances[cornerIndex][1]] = discard(viableNextSteps[(int) shortestDistances[cornerIndex][1]], cornerIndex);
-              
-            // Overwrite info in shortestDistances
-            shortestDistances[cornerIndex][0] = dist;
-            shortestDistances[cornerIndex][1] = pointIndex;
+          currDist += dist(p1.x, p1.y, p2.x, p2.y);
+          if (shortestDistances[i2][0] == 0 || currDist < shortestDistances[i2][0]) {
+            shortestDistances[i2][0] = currDist;
+            shortestDistances[i2][1] = i1;
           }
         }
-        
-        
+        //todo: add intermeiate point
+        //todo: potential better algorithm, just take two coords furthest to both sides (relative to the line segment)
+        // just check all obs and the relevant corners, create func to find dist to side relative to line (just perp distance to line, use the formula or something)
+        // change valid next to only check intersection with other intersected obstacles (modify pot obs function to be able to take specific ones to include in search)
+        // keep track of maxes for both sides, eventually just add maxes to nextPoints
+        // if start to a corner intersects obstacle which is not one of the original obstacles, new point is first obstacle, corner closest to line segment (perp distance)
+        //more complicated: can take other side coords of these widest obstacles as well
       }
     }
   }
@@ -223,3 +273,15 @@ void getNextValidPoints(PVector currPoint, PVector destination, PVector starting
     }
   }
 }
+
+
+
+//todo: own pathfinding for all shoppers
+//todo: may change that to be one pixel to left/right/bottom/top
+
+
+
+
+
+
+//todo: fix pathfinding corner cutting (not fixed but know why)

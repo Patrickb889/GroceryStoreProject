@@ -8,7 +8,7 @@ class Fixture {
   int index = fixtures.size();  // Integer value the fixture will be linked to
   PVector colour;
   int maxStock, stock;
-  float restockChance, urgency;  // urgency = 1 - (sum of current stock of all items / sum of max stock of all items)
+  float urgency;  // urgency = 1 - (sum of current stock of all items / sum of max stock of all items)
   boolean defPointModified = false;  // If this is true, appropriate recalculations will be done
   
   
@@ -25,13 +25,12 @@ class Fixture {
   }
   
   // Default point has been previously determined
-  Fixture(int[] p, int[] msc, String t, String n, String[] pr, int ms, float rc, PVector c, PVector dp) {
+  Fixture(int[] p, int[] msc, String t, String n, String[] pr, int ms, PVector c, PVector dp) {
     this.position = p;
     this.mainSideCoords = msc;
     this.type = t;
     this.name = n;
     this.products = pr;
-    this.restockChance = rc;
     this.maxStock = ms;
     
     if (this.type.equals("Counter"))
@@ -45,13 +44,12 @@ class Fixture {
   }
   
   // Default point not determined
-  Fixture(int[] p, int[] msc, String t, String n, String[] pr, int ms, float rc, PVector c) {
+  Fixture(int[] p, int[] msc, String t, String n, String[] pr, int ms, PVector c) {
     this.position = p;
     this.mainSideCoords = msc;
     this.type = t;
     this.name = n;
     this.products = pr;
-    this.restockChance = rc;
     this.maxStock = ms;
     
     if (this.type.equals("Counter"))
@@ -132,13 +130,6 @@ class Fixture {
     }
   }
   
-  //todo: delete if not used
-  //void restock() {
-  //  float percent = random(1, 20);
-  //  int restockAmount = round(percent * this.maxStock);
-  //  this.stock = min(this.maxStock, this.stock + restockAmount);
-  //  this.urgency = 1 - this.stock/this.maxStock;
-  //}
   
   
   void move(int[] displacements) {

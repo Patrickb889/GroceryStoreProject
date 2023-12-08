@@ -54,10 +54,10 @@ public void replaceProductsClicked(GButton source, GEvent event) { //_CODE_:repl
 
 public void recalculatePathButtonClicked(GButton source, GEvent event) { //_CODE_:recaluclatePathButton:975154:
   int numFixtures = fixtures.size();
-      allDistances = new float[numFixtures][numFixtures];
-      optimalPaths = new String[numFixtures][numFixtures];
-      
-      recalculatePath(); //Manually recalculating the optimal path
+  allDistances = new float[numFixtures][numFixtures];
+  optimalPaths = new String[numFixtures][numFixtures];
+  
+  recalculatePath(); //Manually recalculating the optimal path
 } //_CODE_:recaluclatePathButton:975154:
 
 public void saveStoreButtonClicked(GButton source, GEvent event) { //_CODE_:saveStoreButton:984468:
@@ -81,7 +81,7 @@ public void duplicateClicked(GButton source, GEvent event) { //_CODE_:duplicate:
   
   if(selectedFixture > 0) {
    // Same position, main side, type, name, max stock, restock chance, colour, and default point, but blank list of products
-    fixtures.add(new Fixture(subset(f.position, 0), subset(f.mainSideCoords, 0), f.type, f.name, new String[]{}, f.maxStock, f.restockChance, f.colour, new PVector(f.defaultPoint.x, f.defaultPoint.y)));
+    fixtures.add(new Fixture(subset(f.position, 0), subset(f.mainSideCoords, 0), f.type, f.name, new String[]{}, f.maxStock, f.colour, new PVector(f.defaultPoint.x, f.defaultPoint.y)));
     
     selectedFixture = fixtures.size() - 1;
     Fixture newF = fixtures.get(selectedFixture);

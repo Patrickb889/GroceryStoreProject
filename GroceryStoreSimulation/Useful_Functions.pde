@@ -124,17 +124,6 @@ void checkShoppingList(String checkMode) {
 
 // PATHFINDING RELATED FUNCTIONS //
 
-// Finds number of corners on an obstacle a point to get to directly (not accounting for other obstacles)
-
-//todo: delete if not needed
-int unblockedCorners(PVector startPoint, int[] obCoords) {
-  if (obCoords[0] < startPoint.x && startPoint.x < obCoords[2] || obCoords[1] < startPoint.y && startPoint.y < obCoords[3])  // If a point can only directly go two points on a rectangle, it must be positioned in the cross extending off the rectangle
-    return 2;
-  else  // Any other case, the point will be able to directly access 3 points
-    return 3;
-}
-
-
 // Returns list containing coords of corners of a given obstacle
 PVector[] cornerCoords(int[] obsCoords) {
   PVector TL = new PVector(obsCoords[0], obsCoords[1]);  // Top left
@@ -143,79 +132,6 @@ PVector[] cornerCoords(int[] obsCoords) {
   PVector BR = new PVector(obsCoords[2], obsCoords[3]);  // Bottom right
   
   return new PVector[]{TL, TR, BL, BR};
-}
-
-//todo: delete if not needed
-PVector[] relevantCornerCoords(PVector startPoint, int[] obsCoords) {
-  PVector[] corners = cornerCoords(obsCoords);
-  PVector[] relevantCorners = new PVector[4];  // 4 long but only 2 will be nonzero
-  int numReachable = unblockedCorners(startPoint, obsCoords);
-  
-  int[] selectedIndices = new int[]{-1, -1};
-  
-  if (numReachable == 2) {
-    if (obsCoords[0] < startPoint.x && startPoint.x < obsCoords[2]) {
-      if (startPoint.y <= obsCoords[1])
-        selectedIndices = new int[]{0, 1};  // Top left and top right
-      else
-        selectedIndices = new int[]{2, 3};  // Bottom left and bottom right
-    }
-    
-    else if (obsCoords[1] < startPoint.y && startPoint.y < obsCoords[3]) {
-      if (startPoint.x <= obsCoords[0])
-        selectedIndices = new int[]{0, 2};  // Top left and bottom left
-      else
-        selectedIndices = new int[]{1, 3};  // Top right and bottom right
-    }
-    
-    for (int index : selectedIndices)
-      relevantCorners[index] = corners[index];
-  }
-  
-  else {
-    // Get middle two in terms of distance
-    float minDist = -1, maxDist = -1;
-    int minIndex = -1, maxIndex = -1;
-    
-    for (int c = 0; c < 4; c++) {
-      PVector corner = corners[c];
-      float dist = dist(corner.x, corner.y, startPoint.x, startPoint.y);
-      
-      if (minDist == -1) {  // Initialize min values
-        minDist = dist;
-        minIndex = c;
-        continue;
-      }
-      else if (maxDist == -1) {  // Initialize max values
-        if (dist >= minDist) {
-          maxDist = dist;
-          maxIndex = c;
-        } else {
-          maxDist = minDist;
-          maxIndex = minIndex;
-          minDist = dist;
-          minIndex = c;
-        }
-        continue;
-      }
-      
-      
-      if (dist < minDist) {
-        relevantCorners[minIndex] = corners[minIndex];
-        minDist = dist;
-        minIndex = c;
-      } else if (dist > maxDist) {
-        relevantCorners[maxIndex] = corners[maxIndex];
-        maxDist = dist;
-        maxIndex = c;
-      } else {
-        relevantCorners[c] = corner;
-      }
-        
-    }
-  }
-  
-  return relevantCorners;
 }
 
 
@@ -267,7 +183,7 @@ boolean intersectionFound(int[] obsCoords, PVector startCoords, PVector endCoord
 }
 
 
-// Checks whether or not there are obstacles in the way of a path
+// Checks whether or not there are any obstacles in the way of a path segment
 boolean obsPresent(PVector destination, PVector currPoint) {
   for (int i = 0; i < obstacles.size(); i++) {
     if (intersectionFound(obstacles.get(i), currPoint, destination)) {

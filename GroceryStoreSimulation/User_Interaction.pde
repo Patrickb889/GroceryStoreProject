@@ -1,4 +1,4 @@
-// File data arrays //<>//
+// File data arrays
 float[][] allDistances;
 String[][] optimalPaths;
 
@@ -9,7 +9,7 @@ Textbox textbox = new Textbox();  // Initialize a Textbox object
 String cursor = "";  // Either "" or "|" depending on frameCount
 
 int selectedFixture = -1;  // -1 indicates no fixture is selected
-int presetIndex;//todo: delete after gui
+int presetIndex;  // Index of preset
 
 boolean recalcRequired = false;  // Whether or not the user has modified the store in a way that requires a recalculation of paths
 
@@ -45,8 +45,6 @@ void keyPressed() {
   else if (keyCode == BACKSPACE) {
     if (textbox.show && textbox.text.length() > 0)
       textbox.text = textbox.text.substring(0, textbox.text.length() - 1);  // Removes last character entered into the textbox
-    else if (!textbox.show)
-      deleteLastFixture();//todo: delete if can't figure out
   }
 
   else if (keyCode == 0 && key != '/' && textbox.show)  // No slashes can be entered because they mess with file names
@@ -89,13 +87,6 @@ void keyPressed() {
       recalcRequired = true;
   }
   
-  //todo: delete after gui
-  else if ('0' <= key && key <= '9') {
-    presetIndex = key - 48;
-    
-    addFixture();
-    
-  }
   
   else if (key == 'r') {
     if (altHeld) {
@@ -136,7 +127,7 @@ void keyPressed() {
     
   else if (key == 'V' && selectedFixture > 0) {  // SHIFT + v to duplicate the selected fixture
     // Same position, main side, type, name, max stock, restock chance, colour, and default point, but blank list of products
-    fixtures.add(new Fixture(subset(f.position, 0), subset(f.mainSideCoords, 0), f.type, f.name, new String[]{}, f.maxStock, f.restockChance, f.colour, new PVector(f.defaultPoint.x, f.defaultPoint.y)));
+    fixtures.add(new Fixture(subset(f.position, 0), subset(f.mainSideCoords, 0), f.type, f.name, new String[]{}, f.maxStock, f.colour, new PVector(f.defaultPoint.x, f.defaultPoint.y)));
     
     selectedFixture = fixtures.size() - 1;
     Fixture newF = fixtures.get(selectedFixture);
@@ -167,14 +158,6 @@ int clickX, clickY;
 
 void mousePressed() {
   if (!textbox.show) {
-    //todo: delete after gui
-    if (mouseButton == RIGHT) {
-      for (int i = 0; i < fixturePresets.size(); i++) {
-        FixturePreset preset = fixturePresets.get(i);
-        println(str(i) + ")", preset.name, preset.type);
-      }
-    }
-    
     // Serves as record of previous mouse coords when mouse dragged
     clickX = mouseX;
     clickY = mouseY;
@@ -191,7 +174,6 @@ void mousePressed() {
             thisF.type = f.type;
             thisF.name = f.name;
             thisF.maxStock = f.maxStock;
-            thisF.restockChance = f.restockChance;
             thisF.stock = min(thisF.stock, thisF.maxStock);
           }
           
@@ -384,38 +366,6 @@ void renameFixture() {
   textbox.text = "";
 }
 
-//todo: if time, try to get delete working
-void deleteLastFixture() {
-  //if (fixtures.size() == 2)
-  //  return;
-    
-  //PVector pointToRemove = fixtures.get(selectedFixture).defaultPoint;
-  //for (int i = 0; i < pointsList.size(); i++) {
-  //  if (pointsList.get(i).equals(pointToRemove)) {
-  //    pointsList.remove(i);
-  //    break;
-  //  }
-  //}
-  
-  //for (int i = 0; i < requiredPoints.length; i++) {
-  //  if (requiredPoints[i] == selectedFixture) {
-  //    println(requiredPoints);
-  //    requiredPoints = concat(subset(requiredPoints, 0, selectedFixture), subset(requiredPoints, selectedFixture + 1));
-  //    println(requiredPoints);
-  //  }
-  //}
-  
-  ////println(fixtures.get(selectedFixture).position);
-  //fixtures.remove(fixtures.size() - 1);
-  ////println(obstacles.get(selectedFixture - 2));
-  //obstacles.remove(obstacles.size() - 1);
-  //selectedFixture = -1;
-  
-  //recalcRequired = true;  // Let program know that recalculation is required
-  ////todo: call recheck shopping list, no need to go through and delete requiredPoints / pointsList elements
-  //checkShoppingList();
-}
-
 
 // Adds products to selected fixture's inventory
 void addProducts() {
@@ -590,7 +540,6 @@ void saveStore() {
     outputs[6].println(fixtures.get(i).name);
     outputs[7].println(join(fixtures.get(i).products, ","));
     outputs[8].println(str(fixtures.get(i).maxStock));
-    outputs[9].println(str(fixtures.get(i).restockChance));
 
     // PVectors don't have join()
     PVector c = fixtures.get(i).colour;
@@ -612,6 +561,11 @@ void saveStore() {
 
 // Loads a saved store given the name
 void load(String name) {
+  if (animatePath) {
+    println("Please turn of path animation first");
+    return;
+  }
+    
   if (!loadQueued) {
     loadQueued = true;
     return;
@@ -639,7 +593,6 @@ void load(String name) {
   String[] fixtureNames = loadStrings("Stores/" + storeName + "/names.txt");
   String[] products = loadStrings("Stores/" + storeName + "/products.txt");
   String[] maxStocks = loadStrings("Stores/" + storeName + "/max_stocks.txt");
-  String[] restockChances = loadStrings("Stores/" + storeName + "/restock_chances.txt");
   String[] colours = loadStrings("Stores/" + storeName + "/colours.txt");
   String[] defPoints = loadStrings("Stores/" + storeName + "/default_points.txt");
 
@@ -656,7 +609,6 @@ void load(String name) {
     String currName = fixtureNames[row];
     String[] currProducts = split(products[row], ",");
     int currMaxStock = int(maxStocks[row]);
-    float currRestockChance = float(restockChances[row]);
 
     // PVectors can't be created directly from split()
     float[] rgb = float(split(colours[row], ","));
@@ -680,7 +632,7 @@ void load(String name) {
         currColour = fp.colour;  // Link the colour PVectors together
     }
 
-    fixtures.add(new Fixture(currCoords, currMainSides, currType, currName, currProducts, currMaxStock, currRestockChance, currColour, currDefaultPoint));
+    fixtures.add(new Fixture(currCoords, currMainSides, currType, currName, currProducts, currMaxStock, currColour, currDefaultPoint));
   }
   
   // Add coordinates of all fixtures except entrance and exit into obstacles ArrayList
