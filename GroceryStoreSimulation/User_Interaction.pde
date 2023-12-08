@@ -1,4 +1,4 @@
-// File data arrays
+// File data arrays //<>//
 float[][] allDistances;
 String[][] optimalPaths;
 
@@ -112,17 +112,42 @@ void keyPressed() {
     defaultMoveDistance = 1;  // ALT + wasd moves fixture by 1 pixel instead of 10
   }
     
-  else if (key == 'w' && selectedFixture > 0)  // Move up
-    f.move(new int[]{0, -defaultMoveDistance});
+  else if (key == 'w') {  // Move up
+    if (selectedFixture > 0)
+      f.move(new int[]{0, -defaultMoveDistance});
+    else if (altHeld)
+      exit.y -= 10;
+    else
+      entrance.y -= 10;
+  }
     
-  else if (key == 's' && selectedFixture > 0)  // Move down
-    f.move(new int[]{0, defaultMoveDistance});
+  else if (key == 's') {  // Move down
+    if (selectedFixture > 0)
+      f.move(new int[]{0, defaultMoveDistance});
+    else if (altHeld)
+      exit.y += 10;
+    else
+      entrance.y += 10;
+  }
+      
     
-  else if (key == 'a' && selectedFixture > 0)  // Move left
-    f.move(new int[]{-defaultMoveDistance, 0});
+  else if (key == 'a') {  // Move left
+    if (selectedFixture > 0)
+      f.move(new int[]{-defaultMoveDistance, 0});
+    else if (altHeld)
+      exit.x -= 10;
+    else
+      entrance.x -= 10;
+  }
     
-  else if (key == 'd' && selectedFixture > 0)  // Move right
-    f.move(new int[]{defaultMoveDistance, 0});
+  else if (key == 'd') {  // Move right
+    if (selectedFixture > 0)
+      f.move(new int[]{defaultMoveDistance, 0});
+    else if (altHeld)
+      exit.x += 10;
+    else
+      entrance.x += 10;
+  }
     
     
   else if (key == 'V' && selectedFixture > 0) {  // SHIFT + v to duplicate the selected fixture

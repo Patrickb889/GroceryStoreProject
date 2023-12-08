@@ -3,8 +3,7 @@ class Shopper {
   PVector position, direction;
   PVector velocity = new PVector(0, 0);
   PVector destination = entrance.copy();
-  float cartSpace, speed;
-  ArrayList<Item> items = new ArrayList();
+  float speed;
   int targetFixtureIndex = 0;
   int[] pathSegment = {0};
   int indexInFullPath = 0;
@@ -13,7 +12,6 @@ class Shopper {
   //Constructor
   Shopper(float x, float y, float s) {
    this.position = new PVector(x, y); //Position of the shopper
-   this.cartSpace = 1500; //volume of the cart in cubic centimeters
    this.speed = s; //Speed of the shoper for the drawing
    this.updateVel();
   }
@@ -77,8 +75,6 @@ class Shopper {
         return;
       
       this.pathSegment = reverse(int(split(stringPath, "-")));
-
-      println(pathSegment);
       
       if (this.indexInPathSegment == this.pathSegment.length - 1)
         this.destination = fixtures.get(newPointIndex).defaultPoint;
@@ -112,8 +108,6 @@ class Shopper {
       
       if (this.targetFixtureIndex < newFixtureIndex)
         this.pathSegment = reverse(int(split(stringPath, "-")));
-        
-      println(this.pathSegment);
         
       this.destination = fixtures.get(this.targetFixtureIndex).defaultPoint;
       

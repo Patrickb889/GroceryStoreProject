@@ -97,6 +97,18 @@ public void duplicateClicked(GButton source, GEvent event) { //_CODE_:duplicate:
   }
 } //_CODE_:duplicate:500062:
 
+public void animationCheckbox_clicked1(GCheckbox source, GEvent event) { //_CODE_:animationCheckbox:870596:
+  animatePath = !animatePath;
+} //_CODE_:animationCheckbox:870596:
+
+public void supplyCheckbox_clicked1(GCheckbox source, GEvent event) { //_CODE_:supplyCheckbox:865095:
+  ignoreStock = !ignoreStock;
+} //_CODE_:supplyCheckbox:865095:
+
+public void busynessSlider_change1(GSlider source, GEvent event) { //_CODE_:busynessSlider:915792:
+  busyness = busynessSlider.getValueI();
+} //_CODE_:busynessSlider:915792:
+
 
 
 // Create all the GUI controls. 
@@ -145,7 +157,7 @@ public void createGUI(){
   recaluclatePathButton = new GButton(Window, 25, 270, 100, 40);
   recaluclatePathButton.setText("Recalculate Optimal Path");
   recaluclatePathButton.addEventHandler(this, "recalculatePathButtonClicked");
-  saveStoreButton = new GButton(Window, 25, 190, 100, 40);
+  saveStoreButton = new GButton(Window, 24, 201, 100, 40);
   saveStoreButton.setText("Save Store");
   saveStoreButton.setLocalColorScheme(GCScheme.RED_SCHEME);
   saveStoreButton.addEventHandler(this, "saveStoreButtonClicked");
@@ -180,6 +192,28 @@ public void createGUI(){
   colourLabel.setText("Changing Colours");
   colourLabel.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
   colourLabel.setOpaque(false);
+  animationCheckbox = new GCheckbox(Window, 174, 224, 120, 20);
+  animationCheckbox.setIconAlign(GAlign.LEFT, GAlign.MIDDLE);
+  animationCheckbox.setText("Animate Path");
+  animationCheckbox.setOpaque(false);
+  animationCheckbox.addEventHandler(this, "animationCheckbox_clicked1");
+  supplyCheckbox = new GCheckbox(Window, 174, 191, 120, 30);
+  supplyCheckbox.setIconAlign(GAlign.LEFT, GAlign.MIDDLE);
+  supplyCheckbox.setText("Account For Product Supply");
+  supplyCheckbox.setOpaque(false);
+  supplyCheckbox.addEventHandler(this, "supplyCheckbox_clicked1");
+  label1 = new GLabel(Window, 69, 123, 161, 20);
+  label1.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label1.setText("Busyness of Store");
+  label1.setOpaque(false);
+  busynessSlider = new GSlider(Window, 48, 142, 200, 53, 10.0);
+  busynessSlider.setShowValue(true);
+  busynessSlider.setLimits(10, 0, 100);
+  busynessSlider.setNbrTicks(6);
+  busynessSlider.setShowTicks(true);
+  busynessSlider.setNumberFormat(G4P.INTEGER, 0);
+  busynessSlider.setOpaque(false);
+  busynessSlider.addEventHandler(this, "busynessSlider_change1");
   Window.loop();
 }
 
@@ -203,3 +237,7 @@ GLabel createFixtureLabel;
 GLabel pathfindingLabel; 
 GLabel editingLabel; 
 GLabel colourLabel; 
+GCheckbox animationCheckbox; 
+GCheckbox supplyCheckbox; 
+GLabel label1; 
+GSlider busynessSlider; 

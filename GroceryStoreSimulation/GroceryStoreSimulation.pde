@@ -102,8 +102,6 @@ void setup() {
   fixtures.add(new Fixture(entrance));
   fixtures.add(new Fixture(exit));
   
-  //load("Shoppers");  //demo saved store//todo: change this to gui
-  
   if (!loaded) {
     pointsList.add(entrance);
     pointsList.add(exit);
@@ -208,11 +206,21 @@ void draw() {
   if (pathCalculated && selectedFixture == -1) {
     if (animatePath) {
       shopper.updateMe();
-      shopper.drawMe(); //<>//
+      shopper.drawMe();
       
-    }
+    } //<>//
   }
   
+  if (!animatePath) {
+    shopper.position = entrance.copy();
+    shopper.velocity = new PVector(0, 0);
+    shopper.destination = entrance.copy();
+    
+    shopper.targetFixtureIndex = 0;
+    shopper.pathSegment = new int[]{0};
+    shopper.indexInFullPath = 0;
+    shopper.indexInPathSegment = 0;
+  }
   // Green dot at entrance point
   fill(0, 255, 0);
   circle(entrance.x, entrance.y, 10);

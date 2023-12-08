@@ -21,14 +21,7 @@ class Item {
    //this.colour = co;
   }
   
-  //Methods
-  void grabbed(Shopper s) {
-   this.stock--;
-   this.container.urgency += 1./this.container.maxStock;
-   s.cartSpace -= this.size;
-   s.items.add(this);
-  }
-  
+
   //void placeItemInSpot(Fixture f) {
   //  this.position.x = f.defaultPoint.x;
   //  this.position.y = f.defaultPoint.y;
