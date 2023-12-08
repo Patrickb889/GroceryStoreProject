@@ -25,4 +25,3 @@ ketchup
 cereal
 noodles
 toilet paper
-Broccoli

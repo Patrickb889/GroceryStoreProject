@@ -1,0 +1,9 @@
+
+
+apples,oranges,bananas
+broccoli,spinach,carrots,chives,ginger
+milk,butter,ice cream,yogurt,cheese
+ground beef,chicken wings,porkchops
+cabbage,lettuce,onions
+lemons,limes,pineapple
+cake,cookies,muffins
