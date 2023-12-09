@@ -38,6 +38,8 @@ void recalculatePath() {
   pathCalculated = pathAccuracy.equals("Approx");  // Approx mode does not need a recalculation of every path between every pair of points so pathCalculated would stay true
   pathFound = false;  // pathFound set to false no matter what
   
+  shopper.reinitialize();
+  
   textAlign(CENTER, CENTER);
   textSize(50);
   fill(0);

@@ -586,11 +586,6 @@ void saveStore() {
 
 // Loads a saved store given the name
 void load(String name) {
-  if (animatePath) {
-    println("Please turn of path animation first");
-    return;
-  }
-    
   if (!loadQueued) {
     loadQueued = true;
     return;
@@ -678,5 +673,7 @@ void load(String name) {
   }
   
   fullPath = concat(new int[]{0}, append(requiredPoints, 1));
+  
+  shopper.reinitialize();  // Reset shopper's position and set all pathing indices to 0 to fit the new store
   
 }
